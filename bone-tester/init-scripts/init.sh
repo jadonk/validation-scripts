@@ -60,7 +60,7 @@ delete_uenv() {
 }
 
 run_tests() {
-	FAIL=false
+	unset FAIL
 	run_led_command init_leds
 	run_led_command toggle_timer 3 300
 	for test in $* ; do
