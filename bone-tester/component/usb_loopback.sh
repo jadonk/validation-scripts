@@ -25,6 +25,7 @@ mkdir -p ${TMPFS}
 mount -t tmpfs nodev ${TMPFS}
 dd if=/dev/urandom of=${TMPFS}/test-file bs=512k count=1
 
+umount ${G_FILE_BACKING_DEV} || true
 mkdir -p ${G_FILE_BACKING_MNT}
 mount ${G_FILE_BACKING_DEV} ${G_FILE_BACKING_MNT}
 
@@ -41,6 +42,6 @@ if [ "x$(diff ${G_FILE_BACKING_MNT}/test-file ${TMPFS}/test-file)" != "x" ] ; th
 fi
 
 umount ${TMPFS}
-rm -rf ${TMPFS}
+rm -rf ${TMPFS} || true
 
 bone_echo "USB Host/Device Test Passed!"
