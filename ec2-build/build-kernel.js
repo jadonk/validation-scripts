@@ -8,7 +8,7 @@ userData = new Buffer(userData).toString('base64');
 console.log('userData = ' + userData);
 
 var instanceConfig = {
- 'SpotPrice': '0.500000',
+ 'SpotPrice': '0.300000',
  'LaunchSpecification': {
   'ImageId': 'ami-02df496b',
   'InstanceType': 'cc1.4xlarge',

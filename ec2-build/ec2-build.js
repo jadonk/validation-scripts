@@ -51,7 +51,7 @@ function run(instanceConfig, runCallback) {
    setTimeout(doCall, 2000);
   };
   function doCall() {
-   ec2.describeInstanceStatus(params, handler);
+   //ec2.describeInstanceStatus(params, handler);
    ec2.describeInstances(params, handler);
   };
   return(doCall);

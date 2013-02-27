@@ -24,6 +24,7 @@ packages:
  - libxml2-utils
  - xmlto
  - apache2
+ - lzop
 
 runcmd:
  - dpkg-reconfigure -f noninteractive dash
