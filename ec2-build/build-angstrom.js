@@ -18,8 +18,32 @@ var instanceConfig = {
   'UserData': userData
  }
 };
-var handleSpotInstances = function(err, data) {
+var make_callDescribeSpotInstanceRequests = function(data) {
+ var requestId = data.SpotInstanceRequests[0].SpotInstanceRequestId;
+ var params = {SpotInstanceRequestIds:[requestId]};
+ function doCall() {
+  ec2.describeSpotInstanceRequests(params, handler);
+ };
+ function handler(err, data) {
+  console.log("err = " + err);
+  console.log("data = " + JSON.stringify(data));
+  if(err) throw(err);
+  setTimeout(doCall, 1000);
+ }
+ return(doCall);
+};
+var hRequestSpotInstances = function(err, data) {
  console.log("err = " + err);
  console.log("data = " + JSON.stringify(data));
+ if(err) throw(err);
+ var doCall = make_callDescribeSpotInstanceRequests(data);
+ setTimeout(doCall, 1000);
+
+ var requestId = data.SpotInstanceRequests[0].SpotInstanceRequestId;
+ var params = {SpotInstanceRequestIds:[requestId]};
+ var callback = hDescribeSpotInstanceRequests;
+ k
+ ec2.describeSpotInstanceRequests(params, callback);
 };
-ec2.requestSpotInstances(instanceConfig, handleSpotInstances);
+ec2.requestSpotInstances(instanceConfig, hRequestSpotInstances);
+

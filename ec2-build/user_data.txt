@@ -1,8 +1,4 @@
 #cloud-config
-debconf_selections: |
-        debconf debconf/priority select critical
-        dash dash/sh boolean false
-
 packages:
  - sed
  - wget
@@ -27,7 +23,6 @@ packages:
  - chrpath
  - libxml2-utils
  - xmlto
- - python-psyco
  - apache2
 
 runcmd:
@@ -42,4 +37,8 @@ runcmd:
  - echo "</pre></body></html>" >>/var/www/index.html
  - [ sh, -c, echo "========= Starting build =========" ]
  - [ su, -c, "( cd /mnt/oe; sh oebb.sh update commit a24dfb3d2ac8386d1982a8e4849abf85d7c1dc40 2>&1 >/mnt/oe/update.log ; source ~/.oe/environment ; nohup bitbake minimal-image 2>&1 >/mnt/oe/bitbake.log & )", ubuntu ]
+
+debconf_selections: |
+        debconf debconf/priority select critical
+        dash dash/sh boolean false
 
