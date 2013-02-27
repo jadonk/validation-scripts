@@ -1,0 +1,45 @@
+#cloud-config
+debconf_selections: |
+        debconf debconf/priority select critical
+        dash dash/sh boolean false
+
+packages:
+ - sed
+ - wget
+ - cvs
+ - subversion
+ - git-core
+ - coreutils
+ - unzip
+ - texi2html
+ - texinfo
+ - libsdl1.2-dev
+ - docbook-utils
+ - gawk
+ - python-pysqlite2
+ - diffstat
+ - help2man
+ - make
+ - gcc
+ - build-essential
+ - g++
+ - desktop-file-utils
+ - chrpath
+ - libxml2-utils
+ - xmlto
+ - python-psyco
+ - apache2
+
+runcmd:
+ - dpkg-reconfigure -f noninteractive dash
+ - chown ubuntu /mnt
+ - [ su, -c, "( git clone git://github.com/jadonk/setup-scripts.git /mnt/oe )", ubuntu ]
+ - [ su, -c, "( cd /mnt/oe; MACHINE=beaglebone ./oebb.sh config beaglebone )", ubuntu ]
+ - [ su, -c, "sed -i 's/^#PARALLEL/PARALLEL/g' /mnt/oe/build/conf/local.conf", ubuntu ]
+ - ln -s /mnt/oe /var/www/oe
+ - echo "<html><body><h2>Angstrom environment</h2><p>Browse building <a href='oe/'>directory</a></p><p>or watch <a href='oe/bitbake.log'>bitbake.log</a></p><br/><pre>---------------- local.conf ----------------" >/var/www/index.html
+ - cat /mnt/oe/build/conf/local.conf >>/var/www/index.html
+ - echo "</pre></body></html>" >>/var/www/index.html
+ - [ sh, -c, echo "========= Starting build =========" ]
+ - [ su, -c, "( cd /mnt/oe; sh oebb.sh update commit a24dfb3d2ac8386d1982a8e4849abf85d7c1dc40 2>&1 >/mnt/oe/update.log ; source ~/.oe/environment ; nohup bitbake minimal-image 2>&1 >/mnt/oe/bitbake.log & )", ubuntu ]
+
