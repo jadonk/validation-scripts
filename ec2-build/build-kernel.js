@@ -3,7 +3,7 @@ var config = require('./config');
 var fs = require('fs');
 var ec2-build = require('./ec2-build');
 
-var userData = fs.readFileSync('./build-angstrom.txt', 'ascii').toString('base64');
+var userData = fs.readFileSync('./build-kernel.txt', 'ascii').toString('base64');
 userData = new Buffer(userData).toString('base64');
 console.log('userData = ' + userData);
 

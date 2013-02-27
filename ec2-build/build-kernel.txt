@@ -1,0 +1,45 @@
+#cloud-config
+packages:
+ - sed
+ - wget
+ - cvs
+ - subversion
+ - git-core
+ - coreutils
+ - unzip
+ - texi2html
+ - texinfo
+ - libsdl1.2-dev
+ - docbook-utils
+ - gawk
+ - python-pysqlite2
+ - diffstat
+ - help2man
+ - make
+ - gcc
+ - build-essential
+ - g++
+ - desktop-file-utils
+ - chrpath
+ - libxml2-utils
+ - xmlto
+ - apache2
+
+runcmd:
+ - dpkg-reconfigure -f noninteractive dash
+ - chown ubuntu /mnt
+ - wget http://www.angstrom-distribution.org/toolchains/angstrom-2011.03-x86_64-linux-armv7a-linux-gnueabi-toolchain-qte-4.6.3.tar.bz2 -O /mnt/toolchain.tbz
+ - tar -C / -xjf /mnt/toolchain.tbz
+ - [ su, -c, "( git clone git://github.com/jadonk/validation-scripts.git /mnt/scripts )", ubuntu ]
+ - ln -s /mnt/scripts /var/www/scripts
+ - echo "<html><body><h2>EC2 environment</h2><p>Browse <a href='scripts/'>directory</a></p><p>or watch <a href='scripts/build.log'>build.log</a></p>" >/var/www/index.html
+ - echo "<pre>------------- build-kernel.sh -----------" >>/var/www/index.html
+ - cat /mnt/scripts/ec2-build/build-kernel.sh >>/var/www/index.html
+ - echo "</pre>" >>/var/www/index.html
+ - echo "</body></html>" >>/var/www/index.html
+ - [ su, -c, "( cd /mnt/scripts/ec2-build; nohup ./build-kernel.sh 2>&1 >/mnt/scripts/build.log & )", ubuntu ]
+
+debconf_selections: |
+        debconf debconf/priority select critical
+        dash dash/sh boolean false
+
