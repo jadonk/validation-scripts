@@ -13,8 +13,8 @@ wget http://arago-project.org/git/projects/?p=am33x-cm3.git\;a=blob_plain\;f=bin
 cd kernel
 mkdir rootfs
 make ARCH=arm CROSS_COMPILE=arm-angstrom-linux-gnueabi- beaglebone_defconfig
-make ARCH=arm CROSS_COMPILE=arm-angstrom-linux-gnueabi- -j4 uImage dtbs
-make ARCH=arm CROSS_COMPILE=arm-angstrom-linux-gnueabi- -j4 modules
+make ARCH=arm CROSS_COMPILE=arm-angstrom-linux-gnueabi- -j16 uImage dtbs
+make ARCH=arm CROSS_COMPILE=arm-angstrom-linux-gnueabi- -j16 modules
 make ARCH=arm CROSS_COMPILE=arm-angstrom-linux-gnueabi- INSTALL_MOD_PATH=$HOME/kernel/kernel/rootfs modules_install
 make ARCH=arm CROSS_COMPILE=arm-angstrom-linux-gnueabi- uImage-dtb.am335x-bone
 make ARCH=arm CROSS_COMPILE=arm-angstrom-linux-gnueabi- uImage-dtb.am335x-bonelt
