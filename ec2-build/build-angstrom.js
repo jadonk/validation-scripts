@@ -1,7 +1,7 @@
 var AWS = require('aws-sdk');
 var config = require('./config');
 var fs = require('fs');
-var ec2-build = require('./ec2-build');
+var ec2build = require('./ec2-build');
 
 var userData = fs.readFileSync('./build-angstrom.txt', 'ascii').toString('base64');
 userData = new Buffer(userData).toString('base64');
@@ -16,7 +16,7 @@ var instanceConfig = {
  }
 };
 
-ec2-build.run(instanceConfig, onRun);
+ec2build.run(instanceConfig, onRun);
 
 function onRun(err, data) {
  console.log("err = " + err);
