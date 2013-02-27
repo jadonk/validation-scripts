@@ -1,10 +1,13 @@
 #!/bin/sh
 set -e
 set -x
-PATH=/usr/local/angstrom/arm/bin:$PATH
+PATH=/usr/local/angstrom/arm/bin:/mnt/u-boot/tools:$PATH
 git clone git://github.com/jadonk/kernel.git /mnt/kernel
+git clone git://github.com/jadonk/u-boot.git /mnt/u-boot
 git config --global user.name "Jason Kridner"
 git config --global user.email jdk@ti.com
+cd /mnt/u-boot
+make -j16 tools
 cd /mnt/kernel
 git checkout 3.8
 ./patch.sh
