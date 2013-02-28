@@ -1,4 +1,7 @@
 #cloud-config
+apt_sources:
+ - source: "ppa:chris-lea/node.js"
+
 packages:
  - sed
  - wget
@@ -12,7 +15,9 @@ packages:
  - libsdl1.2-dev
  - docbook-utils
  - gawk
+ - python
  - python-pysqlite2
+ - python-software-properties
  - diffstat
  - help2man
  - make
@@ -25,23 +30,26 @@ packages:
  - xmlto
  - apache2
  - lzop
+ - nodejs
+ - nodejs-dev
+ - npm
+ - software-properties-common
+
+debconf_selections: |
+        debconf debconf/priority select critical
+        dash dash/sh boolean false
 
 runcmd:
  - dpkg-reconfigure -f noninteractive dash
  - chown ubuntu /mnt
  - wget http://www.angstrom-distribution.org/toolchains/angstrom-2011.03-x86_64-linux-armv7a-linux-gnueabi-toolchain-qte-4.6.3.tar.bz2 -O /mnt/toolchain.tbz
  - tar -C / -xjf /mnt/toolchain.tbz
- - [ su, -c, "( git clone git://github.com/jadonk/validation-scripts.git /mnt/scripts )", ubuntu ]
- - ln -s /mnt/scripts /var/www/scripts
- - ln -s /mnt/kernel /var/www/kernel
- - echo "<html><body><h2>EC2 environment</h2><p>Browse <a href='scripts/'>directory</a></p><p>or watch <a href='scripts/build.log'>build.log</a></p>" >/var/www/index.html
+ - [ su, -c, "( git clone git://github.com/jadonk/validation-scripts.git /mnt/build )", ubuntu ]
+ - ln -s /mnt/build /var/www/build
+ - echo "<html><body><h2>EC2 environment</h2><p>Browse <a href='build/'>directory</a></p><p>or watch <a href='build/build.log'>build.log</a></p>" >/var/www/index.html
  - echo "<pre>------------- build-kernel.sh -----------" >>/var/www/index.html
- - cat /mnt/scripts/ec2-build/build-kernel.sh >>/var/www/index.html
+ - cat /mnt/build/ec2-build/build-kernel.sh >>/var/www/index.html
  - echo "</pre>" >>/var/www/index.html
  - echo "</body></html>" >>/var/www/index.html
- - [ su, -c, "( cd /mnt/scripts/ec2-build; nohup ./build-kernel.sh 2>&1 >/mnt/scripts/build.log & )", ubuntu ]
-
-debconf_selections: |
-        debconf debconf/priority select critical
-        dash dash/sh boolean false
+ - [ su, -c, "( cd /mnt/build/ec2-build; nohup ./build-kernel.sh 2>&1 >/mnt/build/build.log & )", ubuntu ]
 

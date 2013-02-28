@@ -2,19 +2,17 @@
 set -e
 set -x
 PATH=/usr/local/angstrom/arm/bin:/mnt/u-boot/tools:$PATH
-git clone git://github.com/jadonk/kernel.git /mnt/kernel
-ln -s /mnt/kernel /mnt/scripts/kernel
-git clone git://github.com/jadonk/u-boot.git /mnt/u-boot
-ln -s /mnt/u-boot /mnt/scripts/u-boot
-git config --global user.name "Jason Kridner"
-git config --global user.email jdk@ti.com
-cd /mnt/u-boot
+node --version
+git clone git://github.com/jadonk/kernel.git /mnt/build/kernel
+git clone git://github.com/jadonk/u-boot.git /mnt/build/u-boot
+git clone git://github.com/jadonk/am33x-cm3.git /mnt/build/am33x-cm3
+cd /mnt/build/u-boot
 make -j16 tools
-cd /mnt/kernel
+cd /mnt/build/kernel
 git checkout 3.8
 ./patch.sh
 cp configs/beaglebone kernel/arch/arm/configs/beaglebone_defconfig
-wget http://arago-project.org/git/projects/?p=am33x-cm3.git\;a=blob_plain\;f=bin/am335x-pm-firmware.bin\;hb=HEAD -O kernel/firmware/am335x-pm-firmware.bin
+cp /mnt/am33x-cm3/bin/am335x-pm-firmware.bin kernel/firmware/am335x-pm-firmware.bin
 cd kernel
 mkdir rootfs
 make ARCH=arm CROSS_COMPILE=arm-angstrom-linux-gnueabi- beaglebone_defconfig
