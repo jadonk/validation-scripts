@@ -1,0 +1,39 @@
+/*
+ * Copyright (C) 2012 Texas Instruments Incorporated - http://www.ti.com/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "ti,beaglebone", "ti,beaglebone-black";
+
+	/* identification */
+	part-number = "pinctrl-test-7";
+
+	fragment@0 {
+		target = <&am33xx_pinmux>;
+		__overlay__ {
+			pinctrl_test: pinctrl_test_7_pins {
+				pinctrl-single,pins = <
+					0x164 0x07	/* P9_42 muxRegOffset, OUTPUT | MODE7 */
+				>;
+			};
+		};
+	};
+
+	fragment@1 {
+		target = <&ocp>;
+		__overlay__ {
+			test_helper: helper {
+				compatible = "bone-pinmux-helper";
+				pinctrl-names = "default";
+				pinctrl-0 = <&pinctrl_test>;
+				status = "okay";
+			};
+		};
+	};
+};
