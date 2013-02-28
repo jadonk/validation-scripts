@@ -1,14 +1,16 @@
 var AWS = require('aws-sdk');
 var config = require('./config');
 var events = require('events');
+var winston = require('winston');
 
 var instanceId = null;
+var ec2 = null;
 
 function run(instanceConfig, runCallback) {
  var emitter = new events.EventEmitter;
  try {
   AWS.config.update(config);
-  var ec2 = new AWS.EC2.Client({region:'us-east-1'});
+  ec2 = new AWS.EC2.Client({region:'us-east-1'});
 
   ec2.requestSpotInstances(instanceConfig, hRequestSpotInstances);
  } catch(ex2) {
@@ -18,9 +20,9 @@ function run(instanceConfig, runCallback) {
  try {
   function hRequestSpotInstances(err, data) {
    try {
-    console.log("requestSpotInstances:");
-    console.log("err = " + err);
-    console.log("data = " + JSON.stringify(data));
+    winston.debug("requestSpotInstances:");
+    winston.debug("err = " + err);
+    winston.debug("data = " + JSON.stringify(data));
     if(err) throw(err);
     var doCall = make_callDescribeSpotInstanceRequests(data);
     setTimeout(doCall, 1000);
@@ -42,9 +44,9 @@ function run(instanceConfig, runCallback) {
     };
     function handler(err, data) {
      try {
-      console.log("describeSpotInstanceRequests:");
-      console.log("err = " + err);
-      console.log("data = " + JSON.stringify(data));
+      winston.debug("describeSpotInstanceRequests:");
+      winston.debug("err = " + err);
+      winston.debug("data = " + JSON.stringify(data));
       if(err) throw(err);
       // check for states "open" and "active"
       var state = data.SpotInstanceRequests[0].State;
@@ -77,11 +79,11 @@ function run(instanceConfig, runCallback) {
     };
     function handler(err, data) {
      try {
-      console.log("describeInstances:");
-      console.log("err = " + err);
-      console.log("data = " + JSON.stringify(data));
+      winston.debug("describeInstances:");
+      winston.debug("err = " + err);
+      winston.debug("data = " + JSON.stringify(data));
       var state = data.Reservations[0].Instances[0].State.Name;
-      console.log("state = " + state);
+      winston.debug("state = " + state);
       if(state == "running") {
        var name = data.Reservations[0].Instances[0].PublicDnsName;
        var address = data.Reservations[0].Instances[0].PublicIpAddress;
@@ -107,13 +109,13 @@ function run(instanceConfig, runCallback) {
 };
 
 function stop() {
- if(instanceId) {
+ if(ec2 && instanceId) {
   var params = {InstanceIds:[instanceId]};
   ec2.stopInstances(params, handler);
   function handler(err, data) {
-   console.log("stopInstances:");
-   console.log("err = " + err);
-   console.log("data = " + JSON.stringify(data));
+   winston.debug("stopInstances:");
+   winston.debug("err = " + err);
+   winston.debug("data = " + JSON.stringify(data));
    if(err) throw(err);
   };
  } else {
