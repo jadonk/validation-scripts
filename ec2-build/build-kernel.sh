@@ -3,7 +3,9 @@ set -e
 set -x
 PATH=/usr/local/angstrom/arm/bin:/mnt/u-boot/tools:$PATH
 git clone git://github.com/jadonk/kernel.git /mnt/kernel
+ln -s /mnt/kernel /mnt/scripts/kernel
 git clone git://github.com/jadonk/u-boot.git /mnt/u-boot
+ln -s /mnt/u-boot /mnt/scripts/u-boot
 git config --global user.name "Jason Kridner"
 git config --global user.email jdk@ti.com
 cd /mnt/u-boot

@@ -33,6 +33,7 @@ runcmd:
  - tar -C / -xjf /mnt/toolchain.tbz
  - [ su, -c, "( git clone git://github.com/jadonk/validation-scripts.git /mnt/scripts )", ubuntu ]
  - ln -s /mnt/scripts /var/www/scripts
+ - ln -s /mnt/kernel /var/www/kernel
  - echo "<html><body><h2>EC2 environment</h2><p>Browse <a href='scripts/'>directory</a></p><p>or watch <a href='scripts/build.log'>build.log</a></p>" >/var/www/index.html
  - echo "<pre>------------- build-kernel.sh -----------" >>/var/www/index.html
  - cat /mnt/scripts/ec2-build/build-kernel.sh >>/var/www/index.html
