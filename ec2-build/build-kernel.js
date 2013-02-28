@@ -3,6 +3,7 @@ var config = require('./config');
 var fs = require('fs');
 var ec2build = require('./ec2-build');
 var winston = require('winston');
+var http = require('http');
 
 winston.setLevels(winston.config.syslog.levels);
 
@@ -17,6 +18,12 @@ var instanceConfig = {
   'InstanceType': 'm1.xlarge',
   'UserData': userData
  }
+};
+
+// Wait 15 minutes to get an instance
+var startupTimeout = setTimeout(onTimeoutError, 15*60*1000);
+function onTimeoutError() {
+ onError("timeout");
 };
 
 try {
@@ -35,10 +42,12 @@ function onError(err) {
 
 var address = null;
 function onRun(err, data) {
+ clearTimeout(startupTimeout);
  winston.info("Build running");
  winston.info("name = " + data.name);
  winston.debug("address = " + data.address);
  winston.debug("data = " + JSON.stringify(data));
+ address = data.address;
  if(err) {
   winston.error("err = " + err);
   ec2build.stop();
@@ -50,6 +59,9 @@ function onRun(err, data) {
 
 var timesChecked = 0;
 function checkStatus() {
+ var request = http.get("http://" + address, currentStatus);
+ request.on('error', statusError);
+
  // stop it after 15 minutes for now
  timesChecked++;
  winston.debug("timesChecked = " + timesChecked);
@@ -57,4 +69,17 @@ function checkStatus() {
   ec2build.stop();
  }
  setTimeout(checkStatus, 60000);
-}
+};
+
+function currentStatus(response) {
+ winston.info("Got response: " + response.statusCode);
+ response.on('data', printStatus);
+};
+
+function printStatus(data) {
+ winston.info(data);
+};
+
+function statusError(e) {
+ winston.info("Got error: " + e.message);
+};
