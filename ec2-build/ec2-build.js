@@ -112,24 +112,27 @@ function run(instanceConfig, runCallback) {
 function stop() {
  if(ec2 && instanceId) {
   var params = {InstanceIds:[instanceId]};
+  winston.info("terminateInstances(" + instanceId + ")");
   ec2.terminateInstances(params, handlerA);
   function handlerA(err, data) {
    winston.debug("terminateInstances:");
    winston.debug("err = " + err);
    winston.debug("data = " + JSON.stringify(data));
-   if(err) throw(err);
+   process.exit();
   };
  } else if(ec2 && requestId) {
+  winston.info("cancelSpotInstanceRequests(" + requestId + ")");
   var params = {SpotInstanceRequestIds:[requestId]};
   ec2.cancelSpotInstanceRequests(params, handlerB);
   function handlerB(err, data) {
    winston.debug("cancelSpotInstanceRequests:");
    winston.debug("err = " + err);
    winston.debug("data = " + JSON.stringify(data));
-   if(err) throw(err);
+   process.exit();
   };
  } else {
-  throw("stop: No running requests or instances found");
+  winston.error("No requests or instances found");
+  throw("stop: No requests or instances found");
  }
 };
 

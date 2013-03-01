@@ -5,7 +5,12 @@ var ec2build = require('./ec2-build');
 var winston = require('winston');
 var http = require('http');
 
-//winston.setLevels(winston.config.syslog.levels);
+winston.setLevels(winston.config.syslog.levels);
+var winstonFileParams = {
+ filename: 'build-kernel.log',
+ level: 'debug'
+};
+winston.add(winston.transports.File, { filename: 'build-kernel.log' });
 
 var userData = fs.readFileSync('./build-kernel.txt', 'ascii').toString('base64');
 userData = new Buffer(userData).toString('base64');
@@ -23,7 +28,7 @@ var instanceConfig = {
 // Wait 15 minutes to get an instance
 var startupTimeout = setTimeout(onTimeoutError, 15*60*1000);
 function onTimeoutError() {
- onError("timeout");
+ onError("Timeout");
 };
 
 try {
@@ -36,8 +41,9 @@ try {
 }
 
 function onError(err) {
- winston.error("Error starting build");
+ winston.error("ERROR!!!");
  winston.error("err = " + err);
+ if(startupTimeout) clearTimeout(startupTimeout);
  ec2build.stop();
 };
 
@@ -87,7 +93,5 @@ function statusError(e) {
 };
 
 function onKill() {
- winston.error("Shutting down from SIGINT (Crtl-C)");
- ec2build.stop();
- process.exit();
+ onError("Shutting down from SIGINT (Crtl-C)");
 };
