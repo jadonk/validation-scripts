@@ -3,6 +3,7 @@ var config = require('./config');
 var events = require('events');
 var winston = require('winston');
 
+var requestId = null;
 var instanceId = null;
 var ec2 = null;
 
@@ -33,7 +34,7 @@ function run(instanceConfig, runCallback) {
  
   function make_callDescribeSpotInstanceRequests(data) {
    try {
-    var requestId = data.SpotInstanceRequests[0].SpotInstanceRequestId;
+    requestId = data.SpotInstanceRequests[0].SpotInstanceRequestId;
     var params = {SpotInstanceRequestIds:[requestId]};
     function doCall() {
      try {
@@ -111,15 +112,24 @@ function run(instanceConfig, runCallback) {
 function stop() {
  if(ec2 && instanceId) {
   var params = {InstanceIds:[instanceId]};
-  ec2.stopInstances(params, handler);
-  function handler(err, data) {
-   winston.debug("stopInstances:");
+  ec2.terminateInstances(params, handlerA);
+  function handlerA(err, data) {
+   winston.debug("terminateInstances:");
+   winston.debug("err = " + err);
+   winston.debug("data = " + JSON.stringify(data));
+   if(err) throw(err);
+  };
+ } else if(ec2 && requestId) {
+  var params = {SpotInstanceRequestIds:[requestId]};
+  ec2.cancelSpotInstanceRequests(params, handlerB);
+  function handlerB(err, data) {
+   winston.debug("cancelSpotInstanceRequests:");
    winston.debug("err = " + err);
    winston.debug("data = " + JSON.stringify(data));
    if(err) throw(err);
   };
  } else {
-  throw("stop: No running instances found");
+  throw("stop: No running requests or instances found");
  }
 };
 

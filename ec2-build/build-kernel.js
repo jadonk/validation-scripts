@@ -5,7 +5,7 @@ var ec2build = require('./ec2-build');
 var winston = require('winston');
 var http = require('http');
 
-winston.setLevels(winston.config.syslog.levels);
+//winston.setLevels(winston.config.syslog.levels);
 
 var userData = fs.readFileSync('./build-kernel.txt', 'ascii').toString('base64');
 userData = new Buffer(userData).toString('base64');
@@ -68,8 +68,9 @@ function checkStatus() {
  winston.debug("timesChecked = " + timesChecked);
  if(timesChecked > 15) {
   ec2build.stop();
+ } else {
+  setTimeout(checkStatus, 60000);
  }
- setTimeout(checkStatus, 60000);
 };
 
 function currentStatus(response) {
