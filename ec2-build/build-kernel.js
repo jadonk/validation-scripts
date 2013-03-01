@@ -10,7 +10,7 @@ var winstonFileParams = {
  filename: 'build-kernel.log',
  level: 'debug'
 };
-winston.add(winston.transports.File, { filename: 'build-kernel.log' });
+winston.add(winston.transports.File, winstonFileParams);
 
 var userData = fs.readFileSync('./build-kernel.txt', 'ascii').toString('base64');
 userData = new Buffer(userData).toString('base64');
@@ -34,17 +34,20 @@ function onTimeoutError() {
 try {
  var instance = ec2build.run(instanceConfig, onRun);
  process.on('SIGINT', onKill);
- instance.on('error', onError);
+ instance.on('error', onRunError);
 } catch(ex) {
- winston.error('ERROR: ' + ex);
- ec2build.stop();
+ onError("Error invoking ec2build.run: " + ex);
 }
+
+function onRunError(err) {
+ onError("Error message from ec2build.run: " + err);
+};
 
 function onError(err) {
  winston.error("ERROR!!!");
  winston.error("err = " + err);
  if(startupTimeout) clearTimeout(startupTimeout);
- ec2build.stop();
+ ec2build.stop(doExit);
 };
 
 var address = null;
@@ -56,8 +59,7 @@ function onRun(err, data) {
  winston.debug("data = " + JSON.stringify(data));
  address = data.address;
  if(err) {
-  winston.error("err = " + err);
-  ec2build.stop();
+  onError("Error passed to onRun: " + err);
  } else {
   // start checking status after a minute
   setTimeout(checkStatus, 60000);
@@ -73,7 +75,7 @@ function checkStatus() {
  timesChecked++;
  winston.debug("timesChecked = " + timesChecked);
  if(timesChecked > 15) {
-  ec2build.stop();
+  ec2build.stop(doExit);
  } else {
   setTimeout(checkStatus, 60000);
  }
@@ -94,4 +96,9 @@ function statusError(e) {
 
 function onKill() {
  onError("Shutting down from SIGINT (Crtl-C)");
+};
+
+function doExit() {
+ winston.transports.File.flush();
+ process.exit();
 };

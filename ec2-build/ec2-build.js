@@ -109,7 +109,7 @@ function run(instanceConfig, runCallback) {
  return(emitter);
 };
 
-function stop() {
+function stop(callback) {
  if(ec2 && instanceId) {
   var params = {InstanceIds:[instanceId]};
   winston.info("terminateInstances(" + instanceId + ")");
@@ -118,7 +118,7 @@ function stop() {
    winston.debug("terminateInstances:");
    winston.debug("err = " + err);
    winston.debug("data = " + JSON.stringify(data));
-   process.exit();
+   callback();
   };
  } else if(ec2 && requestId) {
   winston.info("cancelSpotInstanceRequests(" + requestId + ")");
@@ -128,7 +128,7 @@ function stop() {
    winston.debug("cancelSpotInstanceRequests:");
    winston.debug("err = " + err);
    winston.debug("data = " + JSON.stringify(data));
-   process.exit();
+   callback();
   };
  } else {
   winston.error("No requests or instances found");
