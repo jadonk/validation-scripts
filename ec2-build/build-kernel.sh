@@ -9,7 +9,7 @@ git clone git://github.com/jadonk/am33x-cm3.git /mnt/build/am33x-cm3
 cd /mnt/build/u-boot
 make -j16 tools
 cd /mnt/build/kernel
-git checkout 3.8
+git checkout 3.2
 ./patch.sh
 cp configs/beaglebone kernel/arch/arm/configs/beaglebone_defconfig
 cp /mnt/am33x-cm3/bin/am335x-pm-firmware.bin kernel/firmware/am335x-pm-firmware.bin
