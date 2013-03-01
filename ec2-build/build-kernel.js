@@ -28,6 +28,7 @@ function onTimeoutError() {
 
 try {
  var instance = ec2build.run(instanceConfig, onRun);
+ process.on('SIGINT', onKill);
  instance.on('error', onError);
 } catch(ex) {
  winston.error('ERROR: ' + ex);
@@ -82,4 +83,10 @@ function printStatus(data) {
 
 function statusError(e) {
  winston.info("Got error: " + e.message);
+};
+
+function onKill() {
+ winston.error("Shutting down from SIGINT (Crtl-C)");
+ ec2build.stop();
+ process.exit();
 };
