@@ -1,8 +1,8 @@
 #!/bin/sh
 set -e
 set -x
-PATH=/usr/local/angstrom/arm/bin:/mnt/u-boot/tools:$PATH
 BUILD=/mnt/build
+PATH=$BUILD/u-boot/tools:$PATH
 TOOLS=arm-linux-gnueabi-
 node --version
 git clone git://github.com/jadonk/kernel.git $BUILD/kernel
