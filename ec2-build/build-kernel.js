@@ -62,36 +62,50 @@ function onRun(err, data) {
   onError("Error passed to onRun: " + err);
  } else {
   // start checking status after a minute
-  setTimeout(checkStatus, 60000);
+  setTimeout(checkLog, 60000);
  }
 };
 
 var timesChecked = 0;
-function checkStatus() {
- var request = http.get("http://" + address, currentStatus);
+var log = "";
+var previousLog = "";
+
+function checkLog() {
+ log = "";
+ var request = http.get("http://" + address + "/build/build.log", currentLog);
  request.on('error', statusError);
 
- // stop it after 15 minutes for now
+ // stop it after 15 minutes of no updates for now
  timesChecked++;
  winston.debug("timesChecked = " + timesChecked);
  if(timesChecked > 15) {
   ec2build.stop(doExit);
  } else {
-  setTimeout(checkStatus, 60000);
+  setTimeout(checkLog, 60000);
  }
 };
 
-function currentStatus(response) {
+function currentLog(response) {
  winston.info("Got response: " + response.statusCode);
- response.on('data', printStatus);
+ response.on('data', collectLog);
+ response.on('end', printLog);
 };
 
-function printStatus(data) {
- winston.info(data);
+function collectLog(data) {
+ log += data
+};
+
+function printLog(data) {
+ if(log != previousLog) {
+  log = log.replace(previousLog, "");
+  winston.info(log);
+  previousLog += log;
+  timesChecked = 0;
+ }
 };
 
 function statusError(e) {
- winston.info("Got error: " + e.message);
+ winston.debug("Got error: " + e.message);
 };
 
 function onKill() {
