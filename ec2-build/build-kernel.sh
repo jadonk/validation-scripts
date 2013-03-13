@@ -14,6 +14,7 @@ cd $BUILD/u-boot
 time make -j16 tools
 cd $BUILD/kernel
 time git checkout $BRANCH
+git show
 date
 time ./patch.sh
 date
@@ -33,3 +34,4 @@ time tar -cvzf modules.tgz lib
 cd $BUILD/kernel/kernel/arch/arm/boot/dts
 time tar -cvzf dtb.tgz *.dtb
 date
+echo *** COMPLETED build-kernel.sh ***
