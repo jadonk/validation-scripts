@@ -7,8 +7,11 @@ TAG=f6fe4ce6f4f82be5b2185b12ccadb163a61e512e
 date
 time git clone git://github.com/jadonk/setup-scripts.git /mnt/build/oe
 cd $BUILD/oe
+time git checkout -b $BRANCH origin/$BRANCH
 time MACHINE=beaglebone ./oebb.sh config beaglebone
 sed -i 's/^#PARALLEL/PARALLEL/g' $BUILD/oe/conf/local.conf
 time MACHINE=beaglebone ./oebb.sh update commit $TAG
 source ~/.oe/environment-angstromv2012.12
-time MACHINE=beaglebone ./oebb.sh bitbake -k minimal-image
+time MACHINE=beaglebone ./oebb.sh bitbake -k console-image
+date
+echo !!!! COMPLETED build-angstrom.sh !!!!
