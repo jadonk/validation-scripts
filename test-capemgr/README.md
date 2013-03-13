@@ -72,10 +72,19 @@ Let's check out the starting point state.
 	 4: ff:P-O-L Bone-LT-eMMC-2G,00A0,Texas Instrument,BB-BONE-EMMC-2G
 	 5: ff:P-O-L Bone-Black-HDMI,00A0,Texas Instrument,BB-BONELT-HDMI
 
+Slots 0-3 get assigned by EEPROM IDs on the capes. There are 4 possible
+addresses for the EEPROMs (typically determined by switches on the boards)
+enabling up to 4 boards to be stacked, depending on what functions they
+use. Additional slots are "virtual", added incrementally and are triggered
+in other ways.
+
 With the above you can see that no capes are currently installed. There
 are two "virtual" capes installed, one for the HDMI and one for the
 eMMC. It makes sense to manage these as capes because both interfaces
-consume pins on the cape bus.
+consume pins on the cape bus. These two "virtual" capes are triggered
+because this is the next-generation BeagleBone that includes the eMMC and
+HDMI on the board. Disabling these capes would enable other capes to make
+use of their pins.
 
 Now, let's tell capemgr to load our devicetree overlay fragment that
 configures our target pin's pinmux, take a look at the messages that
@@ -101,6 +110,12 @@ of the pinmux.
 	 4: ff:P-O-L Bone-LT-eMMC-2G,00A0,Texas Instrument,BB-BONE-EMMC-2G
 	 5: ff:P-O-L Bone-Black-HDMI,00A0,Texas Instrument,BB-BONELT-HDMI
 	 6: ff:P-O-L Override Board Name,00A0,Override Manuf,pinctrl-test-7
+
+The $PINS file is a debug entry for the pinctrl kernel module. Looking at it
+tells us the state of the pinmux. To look at the pin state that I want, I
+grep for the lower bits of the address where the pinmux control register is
+for my pin of interest. Let's take a look and see that the mux mode is now 7.
+
 	# cat $PINS | grep 964
 	pin 89 (44e10964) 00000007 pinctrl-single 
 
@@ -127,6 +142,9 @@ And then tell capemgr to load an alternative overlay.
 	[   73.663602] bone-capemgr bone_capemgr.8: slot #7: dtbo 'pinctrl-test-0-00A0.dtbo' loaded; converting to live tree
 	[   73.663857] bone-capemgr bone_capemgr.8: slot #7: #2 overlays
 	[   73.674682] bone-capemgr bone_capemgr.8: slot #7: Applied #2 overlays.
+
+And what does the pinmux look like now?
+
 	# cat $PINS | grep 964
 	pin 89 (44e10964) 00000000 pinctrl-single 
 
