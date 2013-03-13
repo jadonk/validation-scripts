@@ -68,7 +68,7 @@ var previousLog = "";
 
 function checkLog() {
  log = "";
- var request = http.get("http://" + address + "/build/build.log", currentLog);
+ var request = http.get("http://" + address + "/build.log", currentLog);
  request.on('error', statusError);
 
  // stop it after 15 minutes of no updates for now
