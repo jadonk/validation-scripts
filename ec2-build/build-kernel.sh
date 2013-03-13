@@ -4,6 +4,7 @@ set -x
 BUILD=/mnt/build
 PATH=$BUILD/u-boot/tools:$PATH
 TOOLS=arm-linux-gnueabi-
+BRANCH=3.8
 node --version
 git clone git://github.com/jadonk/kernel.git $BUILD/kernel
 git clone git://github.com/jadonk/u-boot.git $BUILD/u-boot
@@ -11,7 +12,7 @@ git clone git://github.com/jadonk/am33x-cm3.git $BUILD/am33x-cm3
 cd $BUILD/u-boot
 make -j16 tools
 cd $BUILD/kernel
-git checkout beaglebone-3.2
+git checkout $BRANCH
 ./patch.sh
 cp $BUILD/kernel/configs/beaglebone $BUILD/kernel/kernel/arch/arm/configs/beaglebone_defconfig
 cp $BUILD/am33x-cm3/bin/am335x-pm-firmware.bin $BUILD/kernel/kernel/firmware/am335x-pm-firmware.bin
