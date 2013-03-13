@@ -6,29 +6,14 @@ apt_sources:
 packages:
  - sed
  - wget
- - cvs
  - subversion
  - git-core
  - coreutils
  - unzip
- - texi2html
- - texinfo
- - libsdl1.2-dev
- - docbook-utils
- - gawk
- - python
- - python-pysqlite2
- - python-software-properties
- - diffstat
- - help2man
  - make
  - gcc
  - build-essential
  - g++
- - desktop-file-utils
- - chrpath
- - libxml2-utils
- - xmlto
  - apache2
  - lzop
  - nodejs
@@ -44,12 +29,8 @@ debconf_selections: |
 runcmd:
  - dpkg-reconfigure -f noninteractive dash
  - chown ubuntu /mnt
+ - npm install -g connect
  - [ su, -c, "( git clone git://github.com/jadonk/validation-scripts.git /mnt/build )", ubuntu ]
- - ln -s /mnt/build /var/www/build
- - echo "<html><body><h2>EC2 environment</h2><p>Browse <a href='build/'>directory</a></p><p>or watch <a href='build/build.log'>build.log</a></p>" >/var/www/index.html
- - echo "<pre>------------- build-kernel.sh -----------" >>/var/www/index.html
- - cat /mnt/build/ec2-build/build-kernel.sh >>/var/www/index.html
- - echo "</pre>" >>/var/www/index.html
- - echo "</body></html>" >>/var/www/index.html
+ - [ su, -c, "( cd /mnt/build; nohup ./ec2-build/server.sh 2>&1 >/mnt/build/server.log & )", ubuntu ]
  - [ su, -c, "( cd /mnt/build/ec2-build; nohup ./build-kernel.sh 2>&1 >/mnt/build/build.log & )", ubuntu ]
 
