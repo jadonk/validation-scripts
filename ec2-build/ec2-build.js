@@ -1,5 +1,4 @@
 var AWS = require('aws-sdk');
-var config = require('./config');
 var events = require('events');
 var winston = require('winston');
 
@@ -7,13 +6,13 @@ var requestId = null;
 var instanceId = null;
 var ec2 = null;
 
-function run(instanceConfig, runCallback) {
+function run(config, runCallback) {
  var emitter = new events.EventEmitter;
  try {
-  AWS.config.update(config);
+  AWS.config.update(config.client);
   ec2 = new AWS.EC2.Client({region:'us-east-1'});
 
-  ec2.requestSpotInstances(instanceConfig, hRequestSpotInstances);
+  ec2.requestSpotInstances(config.instance, hRequestSpotInstances);
  } catch(ex2) {
   emitter.emit('error', ex2);
  }
