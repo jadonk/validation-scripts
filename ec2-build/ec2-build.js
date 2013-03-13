@@ -85,11 +85,16 @@ function run(config, runCallback) {
       var state = data.Reservations[0].Instances[0].State.Name;
       winston.debug("state = " + state);
       if(state == "running") {
-       var name = data.Reservations[0].Instances[0].PublicDnsName;
-       var address = data.Reservations[0].Instances[0].PublicIpAddress;
-       data.name = name;
-       data.address = address;
-       runCallback(err, data);
+       try {
+        var name = data.Reservations[0].Instances[0].PublicDnsName;
+        var address = data.Reservations[0].Instances[0].PublicIpAddress;
+        data.name = name;
+        data.address = address;
+        runCallback(err, data);
+       } catch(ex5) {
+        winston.error("error = " + ex5);
+        setTimeout(doCall, 2000);
+       }
       } else {
        setTimeout(doCall, 2000);
       }
