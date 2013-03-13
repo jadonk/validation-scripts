@@ -16,13 +16,11 @@ var userData = fs.readFileSync('./build-kernel.txt', 'ascii').toString('base64')
 userData = new Buffer(userData).toString('base64');
 winston.debug('userData = ' + userData);
 
-var instanceConfig = {
- 'SpotPrice': '0.080000',
- 'LaunchSpecification': {
-  'ImageId': 'ami-0cdf4965',
-  'InstanceType': 'm1.xlarge',
-  'UserData': userData
- }
+config.instance.SpotPrice = '0.080000';
+config.instance.LaunchSpecification = {
+ 'ImageId': 'ami-0cdf4965',
+ 'InstanceType': 'm1.xlarge',
+ 'UserData': userData
 };
 
 // Wait 15 minutes to get an instance
@@ -32,7 +30,7 @@ function onTimeoutError() {
 };
 
 try {
- var instance = ec2build.run(instanceConfig, onRun);
+ var instance = ec2build.run(config, onRun);
  process.on('SIGINT', onKill);
  instance.on('error', onRunError);
 } catch(ex) {
