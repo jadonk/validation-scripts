@@ -31,6 +31,6 @@ runcmd:
  - chown ubuntu /mnt
  - npm install -g connect
  - [ su, -c, "( git clone git://github.com/jadonk/validation-scripts.git /mnt/build )", ubuntu ]
- - [ su, -c, "( cd /mnt/build; nohup ./ec2-build/server.sh 2>&1 >/mnt/build/server.log & )", ubuntu ]
- - [ su, -c, "( cd /mnt/build/ec2-build; nohup ./build-kernel.sh 2>&1 >/mnt/build/build.log & )", ubuntu ]
+ - [ su, -c, "( cd /mnt/build/ec2-build; nohup ./server.sh 2>&1 >server.log & )", ubuntu ]
+ - [ su, -c, "( cd /mnt/build/ec2-build; nohup ./build-kernel.sh 2>&1 >build.log & )", ubuntu ]
 
