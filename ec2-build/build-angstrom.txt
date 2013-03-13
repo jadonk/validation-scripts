@@ -23,20 +23,15 @@ packages:
  - chrpath
  - libxml2-utils
  - xmlto
- - apache2
 
 runcmd:
  - dpkg-reconfigure -f noninteractive dash
  - chown ubuntu /mnt
- - [ su, -c, "( git clone git://github.com/jadonk/setup-scripts.git /mnt/oe )", ubuntu ]
- - [ su, -c, "( cd /mnt/oe; MACHINE=beaglebone ./oebb.sh config beaglebone )", ubuntu ]
- - [ su, -c, "sed -i 's/^#PARALLEL/PARALLEL/g' /mnt/oe/conf/local.conf", ubuntu ]
- - ln -s /mnt/oe /var/www/oe
- - echo "<html><body><h2>Angstrom environment</h2><p>Browse building <a href='oe/'>directory</a></p><p>or watch <a href='oe/bitbake.log'>bitbake.log</a></p><br/><pre>---------------- local.conf ----------------" >/var/www/index.html
- - cat /mnt/oe/conf/local.conf >>/var/www/index.html
- - echo "</pre></body></html>" >>/var/www/index.html
- - [ sh, -c, echo "========= Starting build =========" ]
- - [ su, -c, "( cd /mnt/oe; MACHINE=beaglebone ./oebb.sh update commit f6fe4ce6f4f82be5b2185b12ccadb163a61e512e 2>&1 >/mnt/oe/update.log ; source ~/.oe/environment-angstromv2012.12 ; nohup bitbake minimal-image 2>&1 >/mnt/oe/bitbake.log & )", ubuntu ]
+ - npm install -g connect
+ - iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8081
+ - [ su, -c, "( git clone git://github.com/jadonk/validation-scripts.git /mnt/build )", ubuntu ]
+ - [ su, -c, "( cd /mnt/build; NODE_PATH=/usr/lib/node_modules nohup ec2-build/server.sh 2>&1 >server.log & )", ubuntu ]
+ - [ su, -c, "( cd /mnt/build; nohup ec2-build/build-angstrom.sh 2>&1 >build.log & )", ubuntu ]
 
 debconf_selections: |
         debconf debconf/priority select critical
