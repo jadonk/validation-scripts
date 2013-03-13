@@ -22,11 +22,14 @@ cp $BUILD/am33x-cm3/bin/am335x-pm-firmware.bin $BUILD/kernel/kernel/firmware/am3
 mkdir -p $BUILD/kernel/kernel/rootfs
 cd $BUILD/kernel/kernel
 time make ARCH=arm CROSS_COMPILE=$TOOLS beaglebone_defconfig
-time make ARCH=arm CROSS_COMPILE=$TOOLS -j16 uImage dtbs
+time make ARCH=arm CROSS_COMPILE=$TOOLS -j16 uImage
+time make ARCH=arm CROSS_COMPILE=$TOOLS -j16 dtbs
 time make ARCH=arm CROSS_COMPILE=$TOOLS -j16 modules
 time make ARCH=arm CROSS_COMPILE=$TOOLS INSTALL_MOD_PATH=$BUILD/kernel/kernel/rootfs modules_install
 time make ARCH=arm CROSS_COMPILE=$TOOLS uImage-dtb.am335x-bone
 time make ARCH=arm CROSS_COMPILE=$TOOLS uImage-dtb.am335x-bonelt
 cd $BUILD/kernel/kernel/rootfs
 time tar -cvzf modules.tgz lib
+cd $BUILD/kernel/kernel/arch/arm/boot/dts
+time tar -cvzf dtb.tgz *.dtb
 date
