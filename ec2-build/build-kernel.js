@@ -1,4 +1,3 @@
-var AWS = require('aws-sdk');
 var config = require('./config');
 var fs = require('fs');
 var ec2build = require('./ec2-build');
