@@ -21,7 +21,7 @@ winston.debug('userData = ' + userData);
 //config.instance.LaunchSpecification.InstanceType = 'cc1.4xlarge';
 config.instance.SpotPrice = '0.080000';
 config.instance.LaunchSpecification.ImageId = 'ami-0cdf4965';
-config.instance.LaunchSpecification.InstanceType = 'm1.xlarge';
+config.instance.LaunchSpecification.InstanceType = 'c1.xlarge';
 config.instance.LaunchSpecification.UserData = userData;
 
 // Wait 15 minutes to get an instance

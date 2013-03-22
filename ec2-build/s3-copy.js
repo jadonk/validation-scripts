@@ -1,5 +1,6 @@
 var AWS = require('aws-sdk');
 var fs = require('fs');
+var winston = require('winston');
 
 var s3 = null;
 
@@ -7,7 +8,7 @@ function copy_to_s3(config, source, bucket, dest, callback) {
  if(!s3) {
   try {
    AWS.config.update(config.client);
-   s3 = new AWS.S3.Client({region:'us-east-1'});
+   s3 = new AWS.S3.Client(config.client);
   } catch(ex) {
    throw 'Error ' + ex;
   }
@@ -16,6 +17,7 @@ function copy_to_s3(config, source, bucket, dest, callback) {
  var pending = 0;
  var stop = 0;
 
+ winston.info("Exploring " + source);
  dive(source);
 
  function dive(dir) {
@@ -33,17 +35,20 @@ function copy_to_s3(config, source, bucket, dest, callback) {
    }
    // iterate over the files
    list.forEach(function(file) {
-    if(!dead) { // if we are already dead, we don't do anything
+    winston.info("Examining " + file);
+    if(!stop) { // if we are already dead, we don't do anything
      var path = dir + "/" + file;
      pending++; // async operation starting after this line
      fs.stat(path, function(err, stat) {
-      if(!dead) { // if we are already dead, we don't do anything
+      if(!stop) { // if we are already dead, we don't do anything
        if (err) {
         fail(err); // if an error occured, let's fail
        } else {
         if (stat && stat.isDirectory()) {
+         winston.info("Exploring directory " + file);
          dive(path); // it's a directory, let's explore recursively
         } else {
+         winston.info("Copying file " + file);
          copy(path, stat); // it's not a directory, just perform the action
         }
         pending--; checkSuccess(); // async operation complete
@@ -60,7 +65,7 @@ function copy_to_s3(config, source, bucket, dest, callback) {
  function copy(file, stat) {
   if(!stop) {
    try {
-    var destFile = dest + file;
+    var destFile = dest + '/' + file;
     do_copy(file, destFile);
    } catch(ex) {
     fail('Copy failed on ' + file + ': ' + ex);
@@ -72,15 +77,19 @@ function copy_to_s3(config, source, bucket, dest, callback) {
   fs.readFile(sourceFile, do_write);
   function do_write(err, data) {
    if (err) { throw err; }
-
-   s3.client.putObject({
+   s3.putObject({
     Bucket: bucket,
     Key: destFile,
     Body: data,
     ACL: 'public-read'
-   }, function (res) {
-    winston.info('Successfully uploaded ' + sourceFile);
-   });
+   }, onput);
+   function onput(err, data) {
+    if(err) {
+     winston.error('Upload of ' + sourceFile + ' failed: ' + err);
+    } else {
+     winston.info('Successfully uploaded ' + sourceFile + ' to ' + bucket + ' at ' + destFile);
+    }
+   }
   }
  }
 
