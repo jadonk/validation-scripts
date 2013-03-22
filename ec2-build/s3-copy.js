@@ -63,7 +63,7 @@ function copy_to_s3(config, source, bucket, dest, callback) {
  function doFile(dir, file) {
   pendingFile++;
   var path = dir + '/' + file;
-  var destFile = dest.replace(/(\/)?$/, '/' + path);
+  var destFile = dest.replace(/(\/)?$/, path.replace(/^(/\/)?/, '/'));
   winston.info("Examining: " + path);
   fs.stat(path, function(err, stat) {
    if(err) fail(err);
