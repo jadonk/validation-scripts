@@ -65,6 +65,7 @@ function copy_to_s3(config, source, bucket, dest, callback) {
    } catch(ex) {
     fail('Copy failed on ' + file + ': ' + ex);
    }
+  }
  }
 
  function do_copy(sourceFile, destFile) {
