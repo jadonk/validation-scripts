@@ -7,7 +7,7 @@ var http = require('http');
 
 winston.setLevels(winston.config.syslog.levels);
 var winstonFileParams = {
- filename: 'build-kernel.log',
+ filename: 'build-angstrom.log',
  level: 'debug'
 };
 winston.add(winston.transports.File, winstonFileParams);
