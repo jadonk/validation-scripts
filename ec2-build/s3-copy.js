@@ -65,8 +65,10 @@ function copy_to_s3(config, source, bucket, dest, callback) {
   var path = dir + '/' + file;
   var destFile = dest.replace(/(\/)?$/, path.replace(/^(/\/)?/, '/'));
   winston.info("Examining: " + path);
-  fs.stat(path, function(err, stat) {
-   if(err) fail(err);
+  fs.stat(path, onStat);
+  function onStat(err, stat) {
+   if(err) return;
+   //if(err) fail(err);
    if(stop) return;
    if (stat && stat.isDirectory()) {
     explore(path);
@@ -79,7 +81,7 @@ function copy_to_s3(config, source, bucket, dest, callback) {
     var file = queueFile.shift();
     doFile(file.dir, file.file);
    }
-  });
+  }
  }
 
  function doS3Read(sourceFile, destFile) {
