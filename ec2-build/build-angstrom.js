@@ -1,7 +1,7 @@
-var AWS = require('aws-sdk');
 var config = require('./config');
 var fs = require('fs');
 var ec2build = require('./ec2-build');
+var s3copy = require('./s3-copy');
 var winston = require('winston');
 var http = require('http');
 
