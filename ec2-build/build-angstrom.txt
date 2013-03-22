@@ -23,6 +23,12 @@ packages:
  - chrpath
  - libxml2-utils
  - xmlto
+ - lzop
+ - nodejs
+ - nodejs-dev
+ - npm
+ - software-properties-common
+ - gcc-arm-linux-gnueabi
 
 runcmd:
  - dpkg-reconfigure -f noninteractive dash
