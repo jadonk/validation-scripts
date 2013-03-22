@@ -16,9 +16,12 @@ var userData = fs.readFileSync('./build-angstrom.txt', 'ascii').toString('base64
 userData = new Buffer(userData).toString('base64');
 winston.debug('userData = ' + userData);
 
+//config.instance.SpotPrice = '0.080000';
+//config.instance.LaunchSpecification.ImageId = 'ami-02df496b';
+//config.instance.LaunchSpecification.InstanceType = 'cc1.4xlarge';
 config.instance.SpotPrice = '0.080000';
-config.instance.LaunchSpecification.ImageId = 'ami-02df496b';
-config.instance.LaunchSpecification.InstanceType = 'cc1.4xlarge';
+config.instance.LaunchSpecification.ImageId = 'ami-0cdf4965';
+config.instance.LaunchSpecification.InstanceType = 'm1.xlarge';
 config.instance.LaunchSpecification.UserData = userData;
 
 try {
