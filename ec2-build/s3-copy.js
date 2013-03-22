@@ -62,8 +62,8 @@ function copy_to_s3(config, source, bucket, dest, callback) {
 
  function doFile(dir, file) {
   pendingFile++;
-  var destFile = dest.replace(/(\/)?$/, '/' + file);
   var path = dir + '/' + file;
+  var destFile = dest.replace(/(\/)?$/, '/' + path);
   winston.info("Examining: " + path);
   fs.stat(path, function(err, stat) {
    if(err) fail(err);
@@ -84,7 +84,8 @@ function copy_to_s3(config, source, bucket, dest, callback) {
 
  function doS3Read(sourceFile, destFile) {
   fs.readFile(sourceFile, function(err, data) {
-   if(err) fail(err);
+   //if(err) fail(err);
+   if(err) return;
    if(stop) return;
    s3.putObject({
     Bucket: bucket,
