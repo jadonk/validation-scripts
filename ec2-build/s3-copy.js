@@ -76,7 +76,7 @@ function copy_to_s3(config, source, bucket, dest, callback) {
    }
    pendingFile--;
    if(queueFile.length > 0 && pendingFile < maxFile) {
-    var file = queueDir.shift();
+    var file = queueFile.shift();
     doFile(file.dir, file.file);
    }
   });
