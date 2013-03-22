@@ -2,6 +2,8 @@ var AWS = require('aws-sdk');
 var fs = require('fs');
 var winston = require('winston');
 
+winston.setLevels(winston.config.syslog.levels);
+
 var s3 = null;
 
 function copy_to_s3(config, source, bucket, dest, callback) {
@@ -33,8 +35,7 @@ function copy_to_s3(config, source, bucket, dest, callback) {
  }
 
  function doDir(dir) {
-  winston.info("Directory: " + dir);
-  winston.debug("dir = " + dir);
+  winston.debug("Directory: " + dir);
   pendingDir++;
   fs.readdir(dir, onDir);
 
@@ -64,7 +65,7 @@ function copy_to_s3(config, source, bucket, dest, callback) {
   pendingFile++;
   var path = dir + '/' + file;
   var destFile = dest.replace(/(\/)?$/, path.replace(/^(\/)?/, '/'));
-  winston.info("Examining: " + path);
+  winston.debug("Examining: " + path);
   fs.stat(path, onStat);
   function onStat(err, stat) {
    if(err) return;
@@ -73,7 +74,7 @@ function copy_to_s3(config, source, bucket, dest, callback) {
    if (stat && stat.isDirectory()) {
     explore(path);
    } else {
-    winston.info("Copying: " + path);
+    winston.debug("Copying: " + path);
     doS3Read(path, destFile);
    }
    pendingFile--;
