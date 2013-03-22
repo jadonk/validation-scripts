@@ -26,6 +26,7 @@ packages:
  - lzop
  - nodejs
  - nodejs-dev
+ - nodejs-legacy
  - npm
  - software-properties-common
  - gcc-arm-linux-gnueabi
