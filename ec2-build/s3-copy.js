@@ -29,7 +29,7 @@ function copy_to_s3(config, source, bucket, dest, callback) {
    return; // if we are already dead, we don't do anything
   }
   if(pendingDir < maxDir) doDir(dir);
-  else queueDir.push(file);
+  else queueDir.push(dir);
  }
 
  function doDir(dir) {
