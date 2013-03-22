@@ -24,6 +24,12 @@ config.instance.LaunchSpecification.ImageId = 'ami-0cdf4965';
 config.instance.LaunchSpecification.InstanceType = 'm1.xlarge';
 config.instance.LaunchSpecification.UserData = userData;
 
+// Wait 15 minutes to get an instance
+var startupTimeout = setTimeout(onTimeoutError, 15*60*1000);
+function onTimeoutError() {
+ onError("Timeout");
+};
+
 try {
  var instance = ec2build.run(config, onRun);
  process.on('SIGINT', onKill);
