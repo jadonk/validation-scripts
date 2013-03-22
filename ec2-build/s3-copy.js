@@ -10,7 +10,7 @@ function copy_to_s3(config, source, bucket, dest, callback) {
   emitter.emit('error', s3);
  }
 
-function () {
+function dummy() {
 fs.readFile(sourceFile, function (err, data) {
     if (err) { throw err; }
 
