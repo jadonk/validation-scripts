@@ -2,23 +2,107 @@ var AWS = require('aws-sdk');
 var config = require('./config');
 var fs = require('fs');
 var ec2build = require('./ec2-build');
+var winston = require('winston');
+var http = require('http');
+
+winston.setLevels(winston.config.syslog.levels);
+var winstonFileParams = {
+ filename: 'build-kernel.log',
+ level: 'debug'
+};
+winston.add(winston.transports.File, winstonFileParams);
 
 var userData = fs.readFileSync('./build-angstrom.txt', 'ascii').toString('base64');
 userData = new Buffer(userData).toString('base64');
-console.log('userData = ' + userData);
+winston.debug('userData = ' + userData);
 
-var instanceConfig = {
- 'SpotPrice': '0.500000',
- 'LaunchSpecification': {
-  'ImageId': 'ami-02df496b',
-  'InstanceType': 'cc1.4xlarge',
-  'UserData': userData
+config.instance.SpotPrice = '0.080000';
+config.instance.LaunchSpecification.ImageId = 'ami-02df496b';
+config.instance.LaunchSpecification.InstanceType = 'cc1.4xlarge';
+config.instance.LaunchSpecification.UserData = userData;
+
+try {
+ var instance = ec2build.run(config, onRun);
+ process.on('SIGINT', onKill);
+ instance.on('error', onRunError);
+} catch(ex) {
+ onError("Error invoking ec2build.run: " + ex);
+}
+
+function onRunError(err) {
+ onError("Error message from ec2build.run: " + err);
+};
+
+function onError(err) {
+ winston.error("ERROR!!!");
+ winston.error("err = " + err);
+ if(startupTimeout) clearTimeout(startupTimeout);
+ ec2build.stop(doExit);
+};
+
+var address = null;
+function onRun(err, data) {
+ clearTimeout(startupTimeout);
+ winston.info("Build running");
+ winston.info("name = " + data.name);
+ winston.debug("address = " + data.address);
+ winston.debug("data = " + JSON.stringify(data));
+ address = data.address;
+ if(err) {
+  onError("Error passed to onRun: " + err);
+ } else {
+  // start checking status after a minute
+  setTimeout(checkLog, 60000);
  }
 };
 
-ec2build.run(instanceConfig, onRun);
+var timesChecked = 0;
+var log = "";
+var previousLog = "";
 
-function onRun(err, data) {
- console.log("err = " + err);
- console.log("data = " + JSON.stringify(data));
+function checkLog() {
+ log = "";
+ var request = http.get("http://" + address + "/build.log", currentLog);
+ request.on('error', statusError);
+
+ // stop it after 15 minutes of no updates for now
+ timesChecked++;
+ winston.debug("timesChecked = " + timesChecked);
+ if(timesChecked > 15) {
+  ec2build.stop(doExit);
+ } else {
+  setTimeout(checkLog, 60000);
+ }
+};
+
+function currentLog(response) {
+ winston.info("Got response: " + response.statusCode);
+ response.on('data', collectLog);
+ response.on('end', printLog);
+};
+
+function collectLog(data) {
+ log += data
+};
+
+function printLog(data) {
+ if(log != previousLog) {
+  log = log.replace(previousLog, "");
+  winston.info(log);
+  previousLog += log;
+  timesChecked = 0;
+ }
+};
+
+function statusError(e) {
+ winston.debug("Got error: " + e.message);
+};
+
+function onKill() {
+ onError("Shutting down from SIGINT (Crtl-C)");
+};
+
+function doExit() {
+ winston.transports.File.flush();
+ process.exit();
 };
