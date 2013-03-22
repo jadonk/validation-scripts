@@ -80,7 +80,7 @@ function copy_to_s3(config, source, bucket, dest, callback) {
    }, function (res) {
     winston.info('Successfully uploaded ' + sourceFile);
    });
-  });
+  }
  }
 
  function checkSuccess() {
