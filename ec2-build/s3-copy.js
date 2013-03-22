@@ -62,7 +62,7 @@ function copy_to_s3(config, source, bucket, dest, callback) {
 
  function doFile(dir, file) {
   pendingFile++;
-  var destFile = dest + '/' + file;
+  var destFile = dest.replace(/(\/)?$/, '/' + file);
   var path = dir + '/' + file;
   winston.info("Examining: " + path);
   fs.stat(path, function(err, stat) {
@@ -93,14 +93,14 @@ function copy_to_s3(config, source, bucket, dest, callback) {
     ACL: 'public-read'
    }, onPut);
   });
- }
 
- function onPut(err, data) {
-  if(err) fail(err);
-  if(stop) return;
-  winston.info('Successfully uploaded ' + sourceFile + ' to ' + bucket + ' at ' + destFile);
-  if(!pendingFile && !pendingDir) {
-   callback();
+  function onPut(err, data) {
+   if(err) fail(err);
+   if(stop) return;
+   winston.info('Successfully uploaded ' + sourceFile + ' to ' + bucket + ' at ' + destFile);
+   if(!pendingFile && !pendingDir) {
+    callback();
+   }
   }
  }
 
