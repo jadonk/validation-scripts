@@ -37,7 +37,7 @@ function onError(err) {
  winston.error("ERROR!!!");
  winston.error("err = " + err);
  if(startupTimeout) clearTimeout(startupTimeout);
- ec2build.stop(doExit);
+ //ec2build.stop(doExit);
 };
 
 var address = null;
@@ -69,7 +69,7 @@ function checkLog() {
  timesChecked++;
  winston.debug("timesChecked = " + timesChecked);
  if(timesChecked > 15) {
-  ec2build.stop(doExit);
+  //ec2build.stop(doExit);
  } else {
   setTimeout(checkLog, 60000);
  }
