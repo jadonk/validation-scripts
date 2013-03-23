@@ -4,7 +4,7 @@ var winston = require('winston');
 
 var s3 = null;
 
-function copy_to_s3(config, source, bucket, dest, callback) {
+function copy_to_s3(config, source, bucket, dest, callback, onupdate) {
  if(!s3) {
   try {
    AWS.config.update(config.client);
