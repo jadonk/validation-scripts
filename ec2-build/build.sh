@@ -1,27 +1,40 @@
+#!/usr/bin/env node
+if(process.argv.length < 3) {
+ console.log("Usage: build.sh kernel|angstrom");
+ return;
+}
+var target = process.argv[1];
+
 var config = require('./config');
 var fs = require('fs');
 var ec2build = require('./ec2-build');
 var winston = require('winston');
 var http = require('http');
 
+var stop = 0;
+
 winston.setLevels(winston.config.syslog.levels);
 var winstonFileParams = {
- filename: 'build-kernel.log',
+ filename: 'build-' + target + '.log',
  level: 'debug'
 };
 winston.add(winston.transports.File, winstonFileParams);
 
-var userData = fs.readFileSync('./build-kernel.txt', 'ascii').toString('base64');
+var userData = fs.readFileSync('./build-' + target + '.txt', 'ascii').toString('base64');
 userData = new Buffer(userData).toString('base64');
 winston.debug('userData = ' + userData);
 
+//config.instance.SpotPrice = '0.080000';
+//config.instance.LaunchSpecification.ImageId = 'ami-02df496b';
+//config.instance.LaunchSpecification.InstanceType = 'cc1.4xlarge';
 config.instance.SpotPrice = '0.080000';
 config.instance.LaunchSpecification.ImageId = 'ami-0cdf4965';
-config.instance.LaunchSpecification.InstanceType = 'm1.xlarge';
+config.instance.LaunchSpecification.InstanceType = 'c1.xlarge';
 config.instance.LaunchSpecification.UserData = userData;
 
 // Wait 15 minutes to get an instance
 var startupTimeout = setTimeout(onTimeoutError, 15*60*1000);
+
 function onTimeoutError() {
  onError("Timeout");
 };
@@ -29,24 +42,54 @@ function onTimeoutError() {
 try {
  var instance = ec2build.run(config, onRun);
  process.on('SIGINT', onKill);
- instance.on('error', onRunError);
+ instance.on('error', onError);
 } catch(ex) {
  onError("Error invoking ec2build.run: " + ex);
 }
 
-function onRunError(err) {
- onError("Error message from ec2build.run: " + err);
-};
-
 function onError(err) {
+ if(stop) return;
+ stop = true;
  winston.error("ERROR!!!");
  winston.error("err = " + err);
  if(startupTimeout) clearTimeout(startupTimeout);
- ec2build.stop(doExit);
+ saveWork(stopBuild);
 };
+
+function saveWork(callback) {
+ var now = new Date();
+ var datestr = now.toJSON();
+ var body = JSON.stringify({
+  'config': config.client,
+  'source': "/mnt/build",
+  'bucket': "beagleboard",
+  'dest': "build-" + target + "-" + datestr
+ });
+ var options = {
+  hostname: address,
+  method: 'POST',
+  path: '/s3copy',
+  headers: {
+   "Content-Type": "application/json",
+   "Content-Length": body.length
+  }
+ };
+ var request = http.request(options, showSaveResponse);
+ request.on('error', callback);
+ request.end(body);
+ function showSaveResponse(response) {
+  response.on('data', function() {});
+  response.on('end', callback);
+ }
+}
+
+function stopBuild() {
+ ec2build.stop(doExit);
+}
 
 var address = null;
 function onRun(err, data) {
+ if(stop) return;
  clearTimeout(startupTimeout);
  winston.info("Build running");
  winston.info("name = " + data.name);
@@ -54,11 +97,11 @@ function onRun(err, data) {
  winston.debug("data = " + JSON.stringify(data));
  address = data.address;
  if(err) {
-  onError("Error passed to onRun: " + err);
- } else {
-  // start checking status after a minute
-  setTimeout(checkLog, 60000);
+  onError(err);
+  return;
  }
+ // start checking status after a minute
+ setTimeout(checkLog, 60000);
 };
 
 var timesChecked = 0;
@@ -74,7 +117,7 @@ function checkLog() {
  timesChecked++;
  winston.debug("timesChecked = " + timesChecked);
  if(timesChecked > 15) {
-  ec2build.stop(doExit);
+  onTimeoutError();
  } else {
   setTimeout(checkLog, 60000);
  }
@@ -104,6 +147,7 @@ function statusError(e) {
 };
 
 function onKill() {
+ if(stop) doExit();
  onError("Shutting down from SIGINT (Crtl-C)");
 };
 
