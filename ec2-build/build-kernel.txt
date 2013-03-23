@@ -1,8 +1,4 @@
 #cloud-config
-apt_sources:
- - source: "ppa:chris-lea/node.js"
- - source: "ppa:linaro-maintainers/toolchain"
-
 packages:
  - sed
  - wget
