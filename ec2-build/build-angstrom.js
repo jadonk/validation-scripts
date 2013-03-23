@@ -89,7 +89,6 @@ function onRun(err, data) {
  winston.debug("address = " + data.address);
  winston.debug("data = " + JSON.stringify(data));
  address = data.address;
- copyAWSConfig(address);
  if(err) {
   onError(err);
   return;
