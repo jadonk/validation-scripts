@@ -14,90 +14,97 @@ function copy_to_s3(config, source, bucket, dest, callback, onupdate) {
   }
  }
 
- var pending = 0;
  var stop = 0;
+ var pendingDir = 0;
+ var pendingFile = 0;
+ var queueDir = [];
+ var queueFile = [];
+ var maxDir = 10;
+ var maxFile = 30;
 
- winston.info("Exploring " + source);
- dive(source);
+ explore(source);
 
- function dive(dir) {
+ function explore(dir) {
   if(stop) {
    return; // if we are already dead, we don't do anything
   }
-  pending++;
-  fs.readdir(dir, function(err, list) {
-   if(stop) {
-    return; // if we are already dead, we don't do anything
-   }
-   if (err) {
-     fail(err); // if an error occured, let's fail
-     return;
-   }
-   // iterate over the files
-   list.forEach(function(file) {
-    winston.info("Examining " + file);
-    if(!stop) { // if we are already dead, we don't do anything
-     var path = dir + "/" + file;
-     pending++; // async operation starting after this line
-     fs.stat(path, function(err, stat) {
-      if(!stop) { // if we are already dead, we don't do anything
-       if (err) {
-        fail(err); // if an error occured, let's fail
-       } else {
-        if (stat && stat.isDirectory()) {
-         winston.info("Exploring directory " + file);
-         dive(path); // it's a directory, let's explore recursively
-        } else {
-         winston.info("Copying file " + file);
-         copy(path, stat); // it's not a directory, just perform the action
-        }
-        pending--; checkSuccess(); // async operation complete
-       }
-      }
-     });
-    }
-   });
-   pending--;
-   checkSuccess(); // async operations complete
-  });
+  if(pendingDir < maxDir) doDir(dir);
+  else queueDir.push(dir);
  }
 
- function copy(file, stat) {
-  if(!stop) {
-   try {
-    var destFile = dest + '/' + file;
-    do_copy(file, destFile);
-   } catch(ex) {
-    fail('Copy failed on ' + file + ': ' + ex);
+ function doDir(dir) {
+  winston.info("Directory: " + dir);
+  winston.debug("dir = " + dir);
+  pendingDir++;
+  fs.readdir(dir, onDir);
+
+  function onDir(err, list) {
+   if(err) fail(err);
+   if(stop) return;
+   winston.debug("dir = " + dir);
+
+   // iterate over the files
+   list.forEach(onFile);
+   pendingDir--;
+   if(queueDir.length > 0 && pendingDir < maxDir) {
+    var newdir = queueDir.shift();
+    doDir(newdir);
+   }
+
+   function onFile(file) {
+    if(stop) return;
+    winston.debug("dir = " + dir);
+    if(pendingFile < maxFile) doFile(dir, file);
+    else queueFile.push({dir:dir, file:file});
    }
   }
  }
 
- function do_copy(sourceFile, destFile) {
-  fs.readFile(sourceFile, do_write);
-  function do_write(err, data) {
-   if (err) { throw err; }
+ function doFile(dir, file) {
+  pendingFile++;
+  var path = dir + '/' + file;
+  var destFile = dest.replace(/(\/)?$/, path.replace(/^(\/)?/, '/'));
+  winston.info("Examining: " + path);
+  fs.stat(path, onStat);
+  function onStat(err, stat) {
+   if(err) return;
+   //if(err) fail(err);
+   if(stop) return;
+   if (stat && stat.isDirectory()) {
+    explore(path);
+   } else {
+    winston.info("Copying: " + path);
+    doS3Read(path, destFile);
+   }
+   pendingFile--;
+   if(queueFile.length > 0 && pendingFile < maxFile) {
+    var file = queueFile.shift();
+    doFile(file.dir, file.file);
+   }
+  }
+ }
+
+ function doS3Read(sourceFile, destFile) {
+  fs.readFile(sourceFile, function(err, data) {
+   //if(err) fail(err);
+   if(err) return;
+   if(stop) return;
    s3.putObject({
     Bucket: bucket,
     Key: destFile,
     Body: data,
     ACL: 'public-read'
-   }, onput);
-   function onput(err, data) {
-    if(err) {
-     onupdate('Upload of ' + sourceFile + ' failed: ' + err + '\n');
-     winston.error('Upload of ' + sourceFile + ' failed: ' + err);
-    } else {
-     onupdate('Successfully uploaded ' + sourceFile + ' to ' + bucket + ' at ' + destFile + '\n');
-     winston.info('Successfully uploaded ' + sourceFile + ' to ' + bucket + ' at ' + destFile);
-    }
-   }
-  }
- }
+   }, onPut);
+  });
 
- function checkSuccess() {
-  if(!stop && !pending) {
-   callback();
+  function onPut(err, data) {
+   if(err) fail(err);
+   if(stop) return;
+   onupdate('Successfully uploaded ' + sourceFile + ' to ' + bucket + ' at ' + destFile + '\n');
+   winston.info('Successfully uploaded ' + sourceFile + ' to ' + bucket + ' at ' + destFile);
+   if(!pendingFile && !pendingDir) {
+    callback();
+   }
   }
  }
 
