@@ -30,7 +30,8 @@ winston.debug('userData = ' + userData);
 //config.instance.LaunchSpecification.ImageId = 'ami-02df496b';
 //config.instance.LaunchSpecification.InstanceType = 'cc1.4xlarge';
 config.instance.SpotPrice = '0.080000';
-config.instance.LaunchSpecification.ImageId = 'ami-0cdf4965';
+//config.instance.LaunchSpecification.ImageId = 'ami-0cdf4965';
+config.instance.LaunchSpecification.ImageId = 'ami-de0d9eb7';
 config.instance.LaunchSpecification.InstanceType = 'c1.xlarge';
 config.instance.LaunchSpecification.UserData = userData;
 
@@ -59,32 +60,36 @@ function onError(err) {
 };
 
 function saveWork(callback) {
- var now = new Date();
- var datestr = now.toJSON();
- var body = JSON.stringify({
-  'config': config.client,
-  'source': "/mnt/build",
-  'bucket': "beagleboard",
-  'dest': "build-" + target + "-" + datestr
- });
- var options = {
-  hostname: address,
-  method: 'POST',
-  path: '/s3copy',
-  headers: {
-   "Content-Type": "application/json",
-   "Content-Length": body.length
+ try {
+  var now = new Date();
+  var datestr = now.toJSON();
+  var body = JSON.stringify({
+   'config': config.client,
+   'source': "/mnt/build",
+   'bucket': "beagleboard",
+   'dest': "build-" + target + "-" + datestr
+  });
+  var options = {
+   hostname: address,
+   method: 'POST',
+   path: '/s3copy',
+   headers: {
+    "Content-Type": "application/json",
+    "Content-Length": body.length
+   }
+  };
+  var request = http.request(options, showSaveResponse);
+  request.on('error', callback);
+  request.end(body);
+  function showSaveResponse(response) {
+   response.on('data', function() {});
+   response.on('end', callback);
   }
- };
- var request = http.request(options, showSaveResponse);
- request.on('error', callback);
- request.end(body);
- function showSaveResponse(response) {
-  response.on('data', function() {});
-  response.on('end', callback);
+ } catch(ex) {
+  callback(ex);
  }
 }
-
+ 
 function stopBuild() {
  ec2build.stop(doExit);
 }
@@ -111,6 +116,7 @@ var log = "";
 var previousLog = "";
 
 function checkLog() {
+ if(stop) return;
  log = "";
  var request = http.get("http://" + address + "/build.log", currentLog);
  request.on('error', statusError);
