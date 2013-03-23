@@ -4,7 +4,7 @@ var winston = require('winston');
 
 var s3 = null;
 
-function copy_to_s3(config, source, bucket, dest, callback) {
+function copy_to_s3(config, source, bucket, dest, callback, onupdate) {
  if(!s3) {
   try {
    AWS.config.update(config.client);
@@ -85,8 +85,10 @@ function copy_to_s3(config, source, bucket, dest, callback) {
    }, onput);
    function onput(err, data) {
     if(err) {
+     onupdate('Upload of ' + sourceFile + ' failed: ' + err + '\n');
      winston.error('Upload of ' + sourceFile + ' failed: ' + err);
     } else {
+     onupdate('Successfully uploaded ' + sourceFile + ' to ' + bucket + ' at ' + destFile + '\n');
      winston.info('Successfully uploaded ' + sourceFile + ' to ' + bucket + ' at ' + destFile);
     }
    }
