@@ -1,15 +1,14 @@
 #!/usr/bin/env node
-var connect = require('connect');
+var express = require('express');
 var s3copy = require('./s3-copy');
 
-var app = connect();
-app.use(connect.favicon());
-app.use(connect.logger('dev'));
-app.use(connect.bodyParser());
-app.use(s3CopyHandler);
-app.use(connect.directory(process.cwd()));
-app.use(connect.static(process.cwd()));
-
+var app = express();
+app.use(express());
+app.use(express('dev'));
+app.use(express());
+app.post('/s3copy', s3CopyHandler);
+app.use(express(process.cwd()));
+app.use(express(process.cwd()));
 app.listen(8081);
 
 function s3CopyHandler(req, res) {
