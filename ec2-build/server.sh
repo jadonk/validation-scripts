@@ -5,7 +5,7 @@ var s3copy = require('./s3-copy');
 var app = connect();
 app.use(connect.favicon());
 app.use(connect.logger('dev'));
-app.post('/s3copy', s3CopyHandler);
+app.use(connect.post('/s3copy', s3CopyHandler));
 app.use(connect.directory(process.cwd()));
 app.use(connect.static(process.cwd()));
 
