@@ -3,12 +3,12 @@ var express = require('express');
 var s3copy = require('./s3-copy');
 
 var app = express();
-app.use(express());
-app.use(express('dev'));
-app.use(express());
+app.use(express.favicon());
+app.use(express.logger('dev'));
+app.use(express.bodyParser());
 app.post('/s3copy', s3CopyHandler);
-app.use(express(process.cwd()));
-app.use(express(process.cwd()));
+app.use(express.directory(process.cwd()));
+app.use(express.static(process.cwd()));
 app.listen(8081);
 
 function s3CopyHandler(req, res) {

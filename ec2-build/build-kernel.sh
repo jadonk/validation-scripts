@@ -5,7 +5,7 @@ BUILD=/mnt/build
 PATH=$BUILD/u-boot/tools:$PATH
 TOOLS=arm-linux-gnueabi-
 BRANCH=3.8
-node --version
+node --version || true
 date
 time git clone git://github.com/jadonk/kernel.git $BUILD/kernel
 time git clone git://github.com/jadonk/u-boot.git $BUILD/u-boot
