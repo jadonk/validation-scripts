@@ -1,5 +1,6 @@
 config.js:
 
+var client = {};
 client.accessKeyId = 'XXXXXXXXXXXXXXXXXXXX';
 client.secretAccessKey = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
 client.region = 'us-east-1';
