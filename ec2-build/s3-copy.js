@@ -6,7 +6,7 @@ winston.setLevels(winston.config.syslog.levels);
 
 var s3 = null;
 
-function copy_to_s3(config, source, bucket, dest, callback) {
+function copy_to_s3(config, source, bucket, dest, callback, onupdate) {
  if(!s3) {
   try {
    AWS.config.update(config.client);
@@ -101,6 +101,7 @@ function copy_to_s3(config, source, bucket, dest, callback) {
   function onPut(err, data) {
    if(err) fail(err);
    if(stop) return;
+   onupdate('Successfully uploaded ' + sourceFile + ' to ' + bucket + ' at ' + destFile + '\n');
    winston.info('Successfully uploaded ' + sourceFile + ' to ' + bucket + ' at ' + destFile);
    if(!pendingFile && !pendingDir) {
     callback();
