@@ -3,7 +3,7 @@ if(process.argv.length < 3) {
  console.log("Usage: build.sh kernel|angstrom");
  return;
 }
-var target = process.argv[1];
+var target = process.argv[2];
 
 var config = require('./config');
 var fs = require('fs');
@@ -19,6 +19,8 @@ var winstonFileParams = {
  level: 'debug'
 };
 winston.add(winston.transports.File, winstonFileParams);
+
+winston.info("building " + target);
 
 var userData = fs.readFileSync('./build-' + target + '.txt', 'ascii').toString('base64');
 userData = new Buffer(userData).toString('base64');
