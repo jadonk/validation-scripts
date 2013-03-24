@@ -13,7 +13,7 @@ app.use(express.directory(process.cwd()));
 app.use(express.static(process.cwd()));
 var server = http.createServer(app);
 var io = socketio.listen(server);
-app.listen(8081);
+server.listen(8081);
 
 io.sockets.on('connection', onConnection);
 function onConnection(socket) {
