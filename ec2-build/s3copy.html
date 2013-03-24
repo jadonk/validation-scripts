@@ -27,20 +27,20 @@ function s3copy() {
 var update_text = "";
 function onupdate(data) {
  var update = document.getElementById('s3copy-update');
- update.innerhtml = update_text + data + '\n';
+ update.innerHTML = update_text + data + '\n';
 }
 var complete_text = "";
 function oncomplete(data) {
  var complete = document.getElementById('s3copy-complete');
- complete.innerhtml = complete_text + data + '\n';
+ complete.innerHTML = complete_text + data + '\n';
 }
 function onconnect(data) {
  var connection_status = document.getElementById('connect-status');
- connection_status.innerhtml = 'Connected: ' + data + '\n';
+ connection_status.innerHTML = 'Connected: ' + data + '\n';
 }
 function ondisconnect(data) {
  var connection_status = document.getElementById('connect-status');
- connection_status.innerhtml = 'Disconnected: ' + data + '\n';
+ connection_status.innerHTML = 'Disconnected: ' + data + '\n';
 }
 </script>
 </head>
