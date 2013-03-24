@@ -34,11 +34,12 @@ function oncomplete(data) {
  var complete = document.getElementById('s3copy-complete');
  complete.innerhtml = complete_text + data + '\n';
 }
-var connection_status = document.getElementById('connect-status');
 function onconnect(data) {
+ var connection_status = document.getElementById('connect-status');
  connection_status.innerhtml = 'Connected: ' + data + '\n';
 }
 function ondisconnect(data) {
+ var connection_status = document.getElementById('connect-status');
  connection_status.innerhtml = 'Disconnected: ' + data + '\n';
 }
 </script>
