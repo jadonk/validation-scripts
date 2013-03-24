@@ -1,15 +1,12 @@
 #!/usr/bin/env node
-if(process.argv.length < 3) {
- console.log("Usage: build.sh kernel|angstrom");
- return;
-}
-var target = process.argv[2];
-
 var config = require('./config');
 var fs = require('fs');
 var ec2build = require('./ec2-build');
 var winston = require('winston');
 var http = require('http');
+
+var target = process.argv[2];
+var address = process.argv[3];
 
 var stop = 0;
 
@@ -35,20 +32,13 @@ config.instance.LaunchSpecification.ImageId = 'ami-0cdf4965';
 config.instance.LaunchSpecification.InstanceType = 'c1.xlarge';
 config.instance.LaunchSpecification.UserData = userData;
 
-// Wait 15 minutes to get an instance
-var startupTimeout = setTimeout(onTimeoutError, 15*60*1000);
+saveWork(function() {
+ winston.info("Got here");
+});
 
 function onTimeoutError() {
  onError("Timeout");
 };
-
-try {
- var instance = ec2build.run(config, onRun);
- process.on('SIGINT', onKill);
- instance.on('error', onError);
-} catch(ex) {
- onError("Error invoking ec2build.run: " + ex);
-}
 
 function onError(err) {
  if(stop) return;
@@ -69,6 +59,7 @@ function saveWork(callback) {
    'bucket': "beagleboard",
    'dest': "build-" + target + "-" + datestr
   });
+  winston.info(JSON.stringify(body));
   var options = {
    hostname: address,
    method: 'POST',
@@ -78,6 +69,7 @@ function saveWork(callback) {
     "Content-Length": body.length
    }
   };
+  winston.info(JSON.stringify(options));
   var request = http.request(options, showSaveResponse);
   request.on('error', callback);
   request.end(body);
