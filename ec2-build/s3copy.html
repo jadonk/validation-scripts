@@ -5,7 +5,9 @@
 <script>
 var socket = io.connect('');
 socket.on('s3copy-complete', oncomplete);
-socket.on('s3copy-update', oncomplete);
+socket.on('s3copy-update', onupdate);
+socket.on('connect', onconnect);
+socket.on('disconnect', ondisconnect);
 function s3copy() {
  function getval(key) {
   return document.getElementById[key].value;
@@ -32,9 +34,17 @@ function oncomplete(data) {
  var complete = document.getElementById('s3copy-complete');
  complete.innerhtml = complete_text + data + '\n';
 }
+var connection_status = document.getElementById('connect-status');
+function onconnect(data) {
+ connection_status.innerhtml = 'Connected: ' + data + '\n';
+}
+function ondisconnect(data) {
+ connection_status.innerhtml = 'Disconnected: ' + data + '\n';
+}
 </script>
 </head>
 <body>
+<h1>S3 Copy</h1>
 <input type='text' id='accessKeyId' />
 <input type='text' id='secretAccessKey' />
 <input type='text' id='region' />
@@ -42,6 +52,8 @@ function oncomplete(data) {
 <input type='text' id='bucket' />
 <input type='text' id='dest' />
 <input type='button' onclick='s3copy()' value='Perform s3copy' />
+<h2>Connection status:</h2>
+<div id="connect-status"></div>
 <h2>Completion status:</h2>
 <div id="s3copy-complete"></div>
 <h2>Copy updates:</h2>
