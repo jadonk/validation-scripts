@@ -2,6 +2,7 @@
 var express = require('express');
 var s3copy = require('./s3-copy');
 var socketio = require('socket.io');
+var http = require('http');
 
 var app = express();
 app.use(express.favicon());
@@ -10,8 +11,8 @@ app.use(express.bodyParser());
 app.post('/s3copy', s3CopyHandler);
 app.use(express.directory(process.cwd()));
 app.use(express.static(process.cwd()));
-var io = socketio.listen(app);
-app.listen(8081);
+var server = http.createServer(app);
+var io = socketio.listen(8081);
 
 io.sockets.on('connection', onConnection);
 function onConnection(socket) {
