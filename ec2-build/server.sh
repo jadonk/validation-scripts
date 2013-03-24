@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 var express = require('express');
 var s3copy = require('./s3-copy');
-var io = require('socket.io');
+var socketio = require('socket.io');
 
 var app = express();
 app.use(express.favicon());
@@ -10,7 +10,7 @@ app.use(express.bodyParser());
 app.post('/s3copy', s3CopyHandler);
 app.use(express.directory(process.cwd()));
 app.use(express.static(process.cwd()));
-io.listen(app);
+var io = socketio.listen(app);
 app.listen(8081);
 
 io.sockets.on('connection', onConnection);
