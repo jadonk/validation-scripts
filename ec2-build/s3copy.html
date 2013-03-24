@@ -21,7 +21,7 @@ function s3copy() {
   'source': getval('source'),
   'bucket': getval('bucket'),
   'dest': getval('dest')
- }'
+ };
  socket.emit('s3copy', { config: 'data' });
 }
 var update_text = "";
