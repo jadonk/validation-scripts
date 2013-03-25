@@ -4,7 +4,7 @@ Usage:
 ./build.sh angstrom|kernel
 ```
 
-You'll need to create config.js first:
+You'll need to create config.js first in your home directory:
 
 config.js:
 

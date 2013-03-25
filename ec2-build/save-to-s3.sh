@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-var config = require('./config');
+var config = require(process.env["HOME"] + '/config');
 var fs = require('fs');
 var ec2build = require('./ec2-build');
 var winston = require('winston');

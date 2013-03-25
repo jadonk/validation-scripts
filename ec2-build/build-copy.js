@@ -1,4 +1,4 @@
-var config = require('./config');
+var config = require(process.env["HOME"] + '/config');
 var http = require('http');
 
 if(process.argv.length < 3) {
