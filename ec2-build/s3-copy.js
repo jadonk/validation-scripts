@@ -135,15 +135,16 @@ function copy_from_s3(config, source, bucket, dest, callback, onupdate) {
  var maxDir = 10;
  var maxFile = 30;
 
- explore(source);
-
- function explore(dir) {
-  if(stop) {
-   return; // if we are already dead, we don't do anything
-  }
-  if(pendingDir < maxDir) doDir(dir);
-  else queueDir.push(dir);
+ var leadingPath = '.';
+ var trailingPath = source;
+ var slashLoc = source.lastIndexOf('/');
+ if(slashLoc > 0) {
+  leadingPath = source.substring(0, slashLoc-1);
+  trailingPath = source.substring(slashLoc+1);
  }
+
+ if(trailingPath == '') doDir(leadingPath);
+ else doFile(leadingPath, trailingPath);
 
  function doDir(dir) {
   winston.debug("Directory: " + dir);
@@ -183,7 +184,8 @@ function copy_from_s3(config, source, bucket, dest, callback, onupdate) {
    //if(err) fail(err);
    if(stop) return;
    if (stat && stat.isDirectory()) {
-    explore(path);
+    if(pendingDir < maxDir) doDir(path);
+    else queueDir.push(path);
    } else {
     winston.debug("Copying: " + path);
     doS3Read(path, destFile);
