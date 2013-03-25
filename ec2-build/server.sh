@@ -1,27 +1,46 @@
 #!/usr/bin/env node
-var connect = require('connect');
+var express = require('express');
 var s3copy = require('./s3-copy');
+var socketio = require('socket.io');
+var http = require('http');
 
-var app = connect();
-app.use(connect.favicon());
-app.use(connect.logger('dev'));
+var app = express();
+app.use(express.favicon());
+app.use(express.logger('dev'));
+app.use(express.bodyParser());
 app.post('/s3copy', s3CopyHandler);
-app.use(connect.directory(process.cwd()));
-app.use(connect.static(process.cwd()));
+app.use(express.directory(process.cwd()));
+app.use(express.static(process.cwd()));
+var server = http.createServer(app);
+var io = socketio.listen(server);
+server.listen(8081);
 
-app.listen(8081);
+io.sockets.on('connection', onConnection);
+function onConnection(socket) {
+ socket.on('s3copy', onS3copy);
+ function onS3copy(data) {
+  console.log('s3copy: ' + data);
+  s3copy.copy_to_s3(data.config, data.source, data.bucket, data.dest, oncomplete, onupdate);
+  function oncomplete(data) {
+   socket.emit('s3copy-complete', data);
+  }
+  function onupdate(data) {
+   socket.emit('s3copy-update', data);
+  }
+ }
+}
 
 function s3CopyHandler(req, res) {
  if(
-  req.data["config"] &&
-  req.data["source"] &&
-  req.data["bucket"] &&
-  req.data["dest"]
+  req.body["config"] &&
+  req.body["source"] &&
+  req.body["bucket"] &&
+  req.body["dest"]
  ) {
-  var config = req.data["config"];
-  var source = req.data["source"];
-  var bucket = req.data["bucket"];
-  var dest = req.data["dest"];
+  var config = req.body["config"];
+  var source = req.body["source"];
+  var bucket = req.body["bucket"];
+  var dest = req.body["dest"];
 
   var now = new Date();
   var date = now.toJSON();

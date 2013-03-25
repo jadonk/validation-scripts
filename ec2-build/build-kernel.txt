@@ -1,8 +1,4 @@
 #cloud-config
-apt_sources:
- - source: "ppa:chris-lea/node.js"
- - source: "ppa:linaro-maintainers/toolchain"
-
 packages:
  - sed
  - wget
@@ -17,6 +13,7 @@ packages:
  - lzop
  - nodejs
  - nodejs-dev
+ - nodejs-legacy
  - npm
  - software-properties-common
  - gcc-arm-linux-gnueabi 
@@ -28,7 +25,7 @@ debconf_selections: |
 runcmd:
  - dpkg-reconfigure -f noninteractive dash
  - chown ubuntu /mnt
- - npm install -g connect socket.io
+ - npm install -g express socket.io
  - iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8081
  - [ su, -c, "( git clone git://github.com/jadonk/validation-scripts.git /mnt/build )", ubuntu ]
  - [ su, -c, "( cd /mnt/build; NODE_PATH=/usr/lib/node_modules nohup ec2-build/server.sh >server.log & )", ubuntu ]

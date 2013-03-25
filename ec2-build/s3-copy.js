@@ -2,6 +2,8 @@ var AWS = require('aws-sdk');
 var fs = require('fs');
 var winston = require('winston');
 
+winston.setLevels(winston.config.syslog.levels);
+
 var s3 = null;
 
 function copy_to_s3(config, source, bucket, dest, callback, onupdate) {
@@ -22,19 +24,23 @@ function copy_to_s3(config, source, bucket, dest, callback, onupdate) {
  var maxDir = 10;
  var maxFile = 30;
 
- explore(source);
-
- function explore(dir) {
-  if(stop) {
-   return; // if we are already dead, we don't do anything
-  }
-  if(pendingDir < maxDir) doDir(dir);
-  else queueDir.push(dir);
+ var leadingPath = '.';
+ var trailingPath = source;
+ var slashLoc = source.lastIndexOf('/');
+ if(slashLoc > 0) {
+  leadingPath = source.substring(0, slashLoc);
+  trailingPath = source.substring(slashLoc+1);
  }
 
+ winston.debug('slashLoc = ' + slashLoc);
+ winston.debug('leadingPath = ' + leadingPath);
+ winston.debug('trailingPath = ' + trailingPath);
+
+ if(trailingPath == '') doDir(leadingPath);
+ else doFile(leadingPath, trailingPath);
+
  function doDir(dir) {
-  winston.info("Directory: " + dir);
-  winston.debug("dir = " + dir);
+  winston.debug("Directory: " + dir);
   pendingDir++;
   fs.readdir(dir, onDir);
 
@@ -63,17 +69,19 @@ function copy_to_s3(config, source, bucket, dest, callback, onupdate) {
  function doFile(dir, file) {
   pendingFile++;
   var path = dir + '/' + file;
-  var destFile = dest.replace(/(\/)?$/, path.replace(/^(\/)?/, '/'));
-  winston.info("Examining: " + path);
+  //var destFile = dest.replace(/(\/)?$/, path.replace(/^(\/)?/, '/'));
+  var destFile = dest + '/' + path.substr(slashLoc+1);
+  winston.debug("Examining: " + path);
   fs.stat(path, onStat);
   function onStat(err, stat) {
    if(err) return;
    //if(err) fail(err);
    if(stop) return;
    if (stat && stat.isDirectory()) {
-    explore(path);
+    if(pendingDir < maxDir) doDir(path);
+    else queueDir.push(path);
    } else {
-    winston.info("Copying: " + path);
+    winston.debug("Copying " + path + " to " + destFile);
     doS3Read(path, destFile);
    }
    pendingFile--;
@@ -100,6 +108,7 @@ function copy_to_s3(config, source, bucket, dest, callback, onupdate) {
   function onPut(err, data) {
    if(err) fail(err);
    if(stop) return;
+   onupdate('Successfully uploaded ' + sourceFile + ' to ' + bucket + ' at ' + destFile + '\n');
    winston.info('Successfully uploaded ' + sourceFile + ' to ' + bucket + ' at ' + destFile);
    if(!pendingFile && !pendingDir) {
     callback();
@@ -115,4 +124,16 @@ function copy_to_s3(config, source, bucket, dest, callback, onupdate) {
  }
 }
 
+function copy_from_s3(config, source, bucket, dest, callback, onupdate) {
+ if(!s3) {
+  try {
+   AWS.config.update(config.client);
+   s3 = new AWS.S3.Client(config.client);
+  } catch(ex) {
+   throw 'Error ' + ex;
+  }
+ }
+}
+
 module.exports.copy_to_s3 = copy_to_s3;
+module.exports.copy_from_s3 = copy_from_s3;
