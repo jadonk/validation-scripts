@@ -28,11 +28,15 @@ function copy_to_s3(config, source, bucket, dest, callback, onupdate) {
  var trailingPath = source;
  var slashLoc = source.lastIndexOf('/');
  if(slashLoc > 0) {
-  leadingPath = source.substring(0, slashLoc-1);
+  leadingPath = source.substring(0, slashLoc);
   trailingPath = source.substring(slashLoc+1);
  } else {
   slashLoc = 0;
  }
+
+ winston.debug('slashLoc = ' + slashLoc);
+ winston.debug('leadingPath = ' + leadingPath);
+ winston.debug('trailingPath = ' + trailingPath);
 
  if(trailingPath == '') doDir(leadingPath);
  else doFile(leadingPath, trailingPath);
@@ -79,7 +83,7 @@ function copy_to_s3(config, source, bucket, dest, callback, onupdate) {
     if(pendingDir < maxDir) doDir(path);
     else queueDir.push(path);
    } else {
-    winston.debug("Copying: " + path);
+    winston.debug("Copying " + path + " to " + destFile);
     doS3Read(path, destFile);
    }
    pendingFile--;
