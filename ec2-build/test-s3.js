@@ -1,5 +1,5 @@
 var s3copy = require('./s3-copy');
-var config = require('./config');
+var config = require('config');
 
 var now = new Date();
 var date = now.toJSON();
