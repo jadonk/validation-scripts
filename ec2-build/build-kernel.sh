@@ -33,5 +33,7 @@ cd $BUILD/kernel/kernel/rootfs
 time tar -cvzf modules.tgz lib
 cd $BUILD/kernel/kernel/arch/arm/boot/dts
 time tar -cvzf dtb.tgz *.dtb
+cd $BUILD/kernel
+time tar -cvzf kernel-sources.tgz kernel
 date
 echo !!!! COMPLETED build-kernel.sh !!!!

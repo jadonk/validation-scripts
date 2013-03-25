@@ -16,5 +16,8 @@ time MACHINE=beaglebone ./oebb.sh config beaglebone
 source ~/.oe/environment-angstromv2012.12
 time bitbake -k console-image
 time bitbake -k cloud9-gnome-image
+cd $BUILD/oe/build
+time tar -cvzf sstate-cache.tgz sstate-cache
+time tar -cvzf output.tgz tmp*-cache
 date
 echo !!!! COMPLETED build-angstrom.sh !!!!
