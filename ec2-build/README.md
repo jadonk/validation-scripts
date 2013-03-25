@@ -1,17 +1,23 @@
+Usage:
+
+   ./build.sh angstrom|kernel
+
+You'll need to create config.js first:
+
 config.js:
 
-var client = {};
-client.accessKeyId = 'XXXXXXXXXXXXXXXXXXXX';
-client.secretAccessKey = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
-client.region = 'us-east-1';
+   var client = {};
+   client.accessKeyId = 'XXXXXXXXXXXXXXXXXXXX';
+   client.secretAccessKey = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
+   client.region = 'us-east-1';
 
-var instance = {};
-instance.LaunchSpecification = {};
-instance.LaunchSpecification.KeyName = 'keypair';
+   var instance = {};
+   instance.LaunchSpecification = {};
+   instance.LaunchSpecification.KeyName = 'keypair';
 
-var sshkey = {};
-sshkey.file = "$HOME/.ssh/keypair";
+   var sshkey = {};
+   sshkey.file = "/home/test/.ssh/keypair";
 
-exports.client = client;
-exports.instance = instance;
-exports.sshkey = sshkey;
+   exports.client = client;
+   exports.instance = instance;
+   exports.sshkey = sshkey;

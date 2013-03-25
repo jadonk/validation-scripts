@@ -36,8 +36,8 @@ config.instance.LaunchSpecification.ImageId = 'ami-0cdf4965';
 config.instance.LaunchSpecification.InstanceType = 'c1.xlarge';
 config.instance.LaunchSpecification.UserData = userData;
 
-// Wait 15 minutes to get an instance
-var startupTimeout = setTimeout(onTimeoutError, 15*60*1000);
+// Wait 30 minutes to get an instance
+var startupTimeout = setTimeout(onTimeoutError, 30*60*1000);
 
 function onTimeoutError() {
  onError("Timeout");
@@ -122,10 +122,10 @@ function checkLog() {
  var request = http.get("http://" + address + "/build.log", currentLog);
  request.on('error', statusError);
 
- // stop it after 15 minutes of no updates for now
+ // stop it after 30 minutes of no updates for now
  timesChecked++;
  winston.debug("timesChecked = " + timesChecked);
- if(timesChecked > 15) {
+ if(timesChecked > 30) {
   onTimeoutError();
  } else {
   setTimeout(checkLog, 60000);
@@ -147,7 +147,7 @@ function printLog(data) {
  if(log != previousLog) {
   if(!configCopied) {
    configCopied = 1;
-   child_process.exec('scp config.js ubuntu@' + address + ':');
+   child_process.exec('scp -i ' + config.sshkey.file + ' config.js ubuntu@' + address + ':');
   }
   log = log.replace(previousLog, "");
   winston.info(log);
