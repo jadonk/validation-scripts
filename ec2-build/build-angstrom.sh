@@ -10,7 +10,6 @@ time git clone git://github.com/Angstrom-distribution/setup-scripts.git /mnt/bui
 cd $BUILD/oe
 time git checkout -b $BRANCH origin/$BRANCH
 time MACHINE=beaglebone ./oebb.sh config beaglebone
-sed -i 's/^-j2/-j4/g' $BUILD/oe/conf/local.conf
 sed -i '/PARALLEL_MAKE.*=.*".*"/PARALLEL_MAKE = "-j4"' $BUILD/oe/conf/local.conf
 sed -i '/BB_NUMBER_THREADS.*=.*"*"/BB_NUMBER_THREADS = "3"' $BUILD/oe/conf/local.conf
 #time MACHINE=beaglebone ./oebb.sh update commit $TAG
