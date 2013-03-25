@@ -30,8 +30,6 @@ function copy_to_s3(config, source, bucket, dest, callback, onupdate) {
  if(slashLoc > 0) {
   leadingPath = source.substring(0, slashLoc);
   trailingPath = source.substring(slashLoc+1);
- } else {
-  slashLoc = 0;
  }
 
  winston.debug('slashLoc = ' + slashLoc);
@@ -72,7 +70,7 @@ function copy_to_s3(config, source, bucket, dest, callback, onupdate) {
   pendingFile++;
   var path = dir + '/' + file;
   //var destFile = dest.replace(/(\/)?$/, path.replace(/^(\/)?/, '/'));
-  var destFile = path.substr(slashLoc);
+  var destFile = dest + '/' + path.substr(slashLoc+1);
   winston.debug("Examining: " + path);
   fs.stat(path, onStat);
   function onStat(err, stat) {
