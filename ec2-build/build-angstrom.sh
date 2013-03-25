@@ -15,7 +15,7 @@ sed -i '/PARALLEL_MAKE.*=.*".*"/PARALLEL_MAKE = "-j4"' $BUILD/oe/conf/local.conf
 sed -i '/BB_NUMBER_THREADS.*=.*"*"/BB_NUMBER_THREADS = "3"' $BUILD/oe/conf/local.conf
 #time MACHINE=beaglebone ./oebb.sh update commit $TAG
 source ~/.oe/environment-angstromv2012.12
-time MACHINE=beaglebone ./oebb.sh bitbake -k console-image
-time MACHINE=beaglebone ./oebb.sh bitbake -k cloud9-gnome-image
+time bitbake -k console-image
+time bitbake -k cloud9-gnome-image
 date
 echo !!!! COMPLETED build-angstrom.sh !!!!
