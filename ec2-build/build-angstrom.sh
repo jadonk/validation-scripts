@@ -21,3 +21,5 @@ time tar -cvzf sstate-cache.tgz sstate-cache
 time tar -cvzf output.tgz tmp*-cache
 date
 echo !!!! COMPLETED build-angstrom.sh !!!!
+cd $BUILD/ec2-build
+NODE_PATH=$HOME node test-s3.js

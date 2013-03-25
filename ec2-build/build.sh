@@ -10,6 +10,7 @@ var fs = require('fs');
 var ec2build = require('./ec2-build');
 var winston = require('winston');
 var http = require('http');
+var child_process = require('child_process')
 
 var stop = 0;
 
@@ -141,8 +142,13 @@ function collectLog(data) {
  log += data
 };
 
+var configCopied = 0;
 function printLog(data) {
  if(log != previousLog) {
+  if(!configCopied) {
+   configCopied = 1;
+   child_process.exec('scp config.js ubuntu@' + address + ':');
+  }
   log = log.replace(previousLog, "");
   winston.info(log);
   previousLog += log;
