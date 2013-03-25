@@ -28,9 +28,9 @@ debconf_selections: |
 runcmd:
  - dpkg-reconfigure -f noninteractive dash
  - chown ubuntu /mnt
- - npm install -g connect
+ - npm install -g connect socket.io
  - iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8081
  - [ su, -c, "( git clone git://github.com/jadonk/validation-scripts.git /mnt/build )", ubuntu ]
- - [ su, -c, "( cd /mnt/build; NODE_PATH=/usr/lib/node_modules nohup ec2-build/server.sh 2>&1 >server.log & )", ubuntu ]
- - [ su, -c, "( cd /mnt/build; nohup ec2-build/build-kernel.sh 2>&1 >build.log & )", ubuntu ]
+ - [ su, -c, "( cd /mnt/build; NODE_PATH=/usr/lib/node_modules nohup ec2-build/server.sh >server.log & )", ubuntu ]
+ - [ su, -c, "( cd /mnt/build; nohup ec2-build/build-kernel.sh >build.log & )", ubuntu ]
 
