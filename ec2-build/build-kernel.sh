@@ -6,6 +6,7 @@ PATH=$BUILD/u-boot/tools:$PATH
 TOOLS=arm-linux-gnueabi-
 REPO=beagleboard
 BRANCH=3.8
+DATE=`date +%F-%T`
 node --version || true
 date
 time git clone git://github.com/$REPO/kernel.git $BUILD/kernel
@@ -38,3 +39,10 @@ cd $BUILD/kernel
 time tar -cvzf kernel-sources.tgz kernel
 date
 echo !!!! COMPLETED build-kernel.sh !!!!
+cd $BUILD/ec2-build
+./s3cp $BUILD/build.log kernel-$DATE
+./s3cp $BUILD/kernel/kernel/rootfs/modules.tgz kernel-$DATE
+./s3cp $BUILD/kernel/kernel/arch/arm/boot/uImage kernel-$DATE
+./s3cp $BUILD/kernel/kernel/arch/arm/boot/uImage-dtb.am335x-bone kernel-$DATE
+./s3cp $BUILD/kernel/kernel/arch/arm/boot/uImage-dtb.am335x-boneblack kernel-$DATE
+./s3cp $BUILD/kernel/kernel/arch/arm/boot/dts/dtb.tgz kernel-$DATE
