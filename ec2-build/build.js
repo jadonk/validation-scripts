@@ -119,8 +119,12 @@ var previousLog = "";
 function checkLog() {
  if(stop) return;
  log = "";
- var request = http.get("http://" + address + "/build.log", currentLog);
- request.on('error', statusError);
+ try {
+  var request = http.get("http://" + address + "/build.log", currentLog);
+  request.on('error', statusError);
+ } catch(ex) {
+  winstion.debug('Request error: ' + ex);
+ }
 
  // stop it after 30 minutes of no updates for now
  timesChecked++;
@@ -149,14 +153,18 @@ function printLog(data) {
    configCopied = 1;
    child_process.exec('scp -i ' + config.sshkey.file + ' config.js ubuntu@' + address + ':');
   }
-  log = log.replace(previousLog, "");
+  try {
+   log = log.replace(previousLog, "");
+  } catch(ex) {
+   winston.debug("Unable to trim log");
+  }
   winston.info(log);
   previousLog += log;
   timesChecked = 0;
  }
- if(log.match(/!!!! COMPLETED/)) {
-  saveWork(stopBuild);
- }
+ //if(log.match(/!!!! COMPLETED/)) {
+ // saveWork(stopBuild);
+ //}
 };
 
 function statusError(e) {

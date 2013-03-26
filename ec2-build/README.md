@@ -1,7 +1,7 @@
 Usage:
 
 ```sh
-./build.sh angstrom|kernel
+./build.js angstrom|kernel
 ```
 
 You'll need to create config.js first in your home directory:
