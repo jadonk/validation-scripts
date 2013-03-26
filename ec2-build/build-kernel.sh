@@ -4,10 +4,11 @@ set -x
 BUILD=/mnt/build
 PATH=$BUILD/u-boot/tools:$PATH
 TOOLS=arm-linux-gnueabi-
+REPO=beagleboard
 BRANCH=3.8
 node --version || true
 date
-time git clone git://github.com/jadonk/kernel.git $BUILD/kernel
+time git clone git://github.com/$REPO/kernel.git $BUILD/kernel
 time git clone git://github.com/jadonk/u-boot.git $BUILD/u-boot
 time git clone git://github.com/jadonk/am33x-cm3.git $BUILD/am33x-cm3
 cd $BUILD/u-boot
