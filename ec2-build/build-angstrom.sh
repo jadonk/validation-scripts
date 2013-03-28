@@ -7,6 +7,7 @@ DATE=`date +%F-%T`
 #TAG=f6fe4ce6f4f82be5b2185b12ccadb163a61e512e
 date
 if [ -e $BUILD/oe ]
+then
  cd $BUILD
 # time MACHINE=beaglebone ./oebb.sh update commit $TAG
  time MACHINE=beaglebone ./oebb.sh update
