@@ -31,8 +31,9 @@ winston.debug('userData = ' + userData);
 //config.instance.LaunchSpecification.ImageId = 'ami-02df496b';
 //config.instance.LaunchSpecification.InstanceType = 'cc1.4xlarge';
 config.instance.SpotPrice = '0.080000';
-config.instance.LaunchSpecification.ImageId = 'ami-0cdf4965';
+//config.instance.LaunchSpecification.ImageId = 'ami-0cdf4965';
 //config.instance.LaunchSpecification.ImageId = 'ami-de0d9eb7';
+config.instance.LaunchSpecification.ImageId = 'ami-08df4961';
 config.instance.LaunchSpecification.InstanceType = 'c1.xlarge';
 config.instance.LaunchSpecification.UserData = userData;
 
