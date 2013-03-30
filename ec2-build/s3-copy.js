@@ -104,9 +104,9 @@ function copy_to_s3(config, source, bucket, dest, callback, onupdate) {
     ACL: 'public-read'
    };
    if(('' + sourceFile).match(/\.htm(l)$/)) {
-    options["Content-Type"] = "text/html";
+    options["ContentType"] = "text/html";
    } else if(('' + sourceFile).match(/\.log$/)) {
-    options["Content-Type"] = "text/plain";
+    options["ContentType"] = "text/plain";
    }
    s3.putObject(options, onPut);
   });
