@@ -147,7 +147,10 @@ function printLog(data) {
  if(log != previousLog) {
   if(!configCopied) {
    configCopied = 1;
-   child_process.exec('scp -i ' + config.sshkey.file + ' ' + config.config.file +' ubuntu@' + address + ':');
+   try {
+    child_process.exec('scp -i ' + config.sshkey.file + ' ' + config.config.file +' ubuntu@' + address + ':');
+   } catch(ex) {
+   }
   }
   try {
    log = log.replace(previousLog, "");
