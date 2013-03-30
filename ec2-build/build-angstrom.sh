@@ -27,7 +27,30 @@ time bitbake -k cloud9-gnome-image
 cd $BUILD/oe/build
 date
 echo !!!! COMPLETED build-angstrom.sh !!!!
+cd $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone
+MODULES=`ls modules*`
+cat >image.html <<EOF
+<html>
+<head>
+<title>Angstrom $DATE</title>
+</head>
+<body>
+<h1>Angstrom $DATE</h1>
+<ul>
+<li><a href="build.log">build.log</a></li>
+<li><a href="MLO">MLO</a></li>
+<li><a href="u-boot.img">u-boot.img</a></li>
+<li><a href="uImage">uImage</a></li>
+<li><a href="$MODULES">$MODULES</a></li>
+<li><a href="Angstrom-Cloud9-IDE-GNOME-eglibc-ipk-v2012.12-beaglebone.rootfs.tar.gz">
+Angstrom-Cloud9-IDE-GNOME-eglibc-ipk-v2012.12-beaglebone.rootfs.tar.gz
+</a></li>
+</ul>
+</body>
+</html>
+EOF
 cd $BUILD/ec2-build
+./s3cp $BUILD/image.html angstrom-$DATE
 ./s3cp $BUILD/build.log angstrom-$DATE
 ./s3cp $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone/MLO angstrom-$DATE
 ./s3cp $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone/u-boot.img angstrom-$DATE
