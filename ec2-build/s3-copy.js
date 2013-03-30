@@ -103,8 +103,10 @@ function copy_to_s3(config, source, bucket, dest, callback, onupdate) {
     Body: data,
     ACL: 'public-read'
    };
-   if(sourceFile.match(/htm(l)$/)) {
+   if(('' + sourceFile).match(/\.htm(l)$/)) {
     options["Content-Type"] = "text/html";
+   } else if(('' + sourceFile).match(/\.log$/)) {
+    options["Content-Type"] = "text/plain";
    }
    s3.putObject(options, onPut);
   });
