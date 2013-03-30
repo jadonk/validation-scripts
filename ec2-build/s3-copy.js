@@ -97,12 +97,16 @@ function copy_to_s3(config, source, bucket, dest, callback, onupdate) {
    //if(err) fail(err);
    if(err) return;
    if(stop) return;
-   s3.putObject({
+   var options = {
     Bucket: bucket,
     Key: destFile,
     Body: data,
     ACL: 'public-read'
-   }, onPut);
+   };
+   if(sourceFile.match(/htm(l)$/)) {
+    options["Content-Type"] = "text/html";
+   }
+   s3.putObject(options, onPut);
   });
 
   function onPut(err, data) {

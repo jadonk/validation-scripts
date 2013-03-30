@@ -29,7 +29,7 @@ date
 echo !!!! COMPLETED build-angstrom.sh !!!!
 cd $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone
 MODULES=`ls modules*`
-cat >image.html <<EOF
+cat >index.html <<EOF
 <html>
 <head>
 <title>Angstrom $DATE</title>
@@ -50,7 +50,7 @@ Angstrom-Cloud9-IDE-GNOME-eglibc-ipk-v2012.12-beaglebone.rootfs.tar.gz
 </html>
 EOF
 cd $BUILD/ec2-build
-./s3cp $BUILD/image.html angstrom-$DATE
+./s3cp $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone/index.html angstrom-$DATE
 ./s3cp $BUILD/build.log angstrom-$DATE
 ./s3cp $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone/MLO angstrom-$DATE
 ./s3cp $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone/u-boot.img angstrom-$DATE
