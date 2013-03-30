@@ -23,6 +23,7 @@ packages:
  - chrpath
  - libxml2-utils
  - xmlto
+ - liburi-perl
  - lzop
  - nodejs
  - nodejs-dev
