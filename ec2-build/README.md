@@ -21,7 +21,11 @@ instance.LaunchSpecification.KeyName = 'keypair';
 var sshkey = {};
 sshkey.file = "/home/test/.ssh/keypair";
 
+var config = {};
+config.file = "/home/test/config.js";
+
 exports.client = client;
 exports.instance = instance;
 exports.sshkey = sshkey;
+exports.config = config;
 ```
