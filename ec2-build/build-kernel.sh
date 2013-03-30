@@ -1,5 +1,5 @@
 #!/bin/sh
-set -e
+#set -e
 set -x
 BUILD=/mnt/build
 PATH=$BUILD/u-boot/tools:$PATH

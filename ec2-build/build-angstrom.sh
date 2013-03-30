@@ -1,5 +1,5 @@
 #!/bin/sh
-set -e
+#set -e
 set -x
 BUILD=/mnt/build
 BRANCH=angstrom-v2012.12-yocto1.3
