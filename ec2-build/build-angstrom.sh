@@ -27,6 +27,8 @@ time bitbake -k cloud9-gnome-image
 cd $BUILD/oe/build
 date
 echo !!!! COMPLETED build-angstrom.sh !!!!
+cd $BUILD/oe
+tar czf ources.tgz oe/oebb.sh oe/README oe/conf oe/sources oe/scripts
 cd $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone
 MODULES=`ls modules*`
 cat >index.html <<EOF
@@ -45,6 +47,7 @@ cat >index.html <<EOF
 <li><a href="Angstrom-Cloud9-IDE-GNOME-eglibc-ipk-v2012.12-beaglebone.rootfs.tar.gz">
 Angstrom-Cloud9-IDE-GNOME-eglibc-ipk-v2012.12-beaglebone.rootfs.tar.gz
 </a></li>
+<li><a href="sources.tgz">oe-sources.tgz</a></li>
 </ul>
 </body>
 </html>
@@ -57,3 +60,4 @@ cd $BUILD/ec2-build
 ./s3cp $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone/uImage angstrom-$DATE
 ./s3cp $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone/modules* angstrom-$DATE
 ./s3cp $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone/Angstrom-Cloud9-IDE-GNOME-eglibc-ipk-v2012.12-beaglebone.rootfs.tar.gz angstrom-$DATE
+./s3cp $BUILD/oe/sources.tgz angstrom-$DATE
