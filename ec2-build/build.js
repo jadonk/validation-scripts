@@ -27,10 +27,11 @@ var userData = fs.readFileSync('./build-' + target + '.txt', 'ascii').toString('
 userData = new Buffer(userData).toString('base64');
 winston.debug('userData = ' + userData);
 
-config.instance.SpotPrice = '0.030000';
-config.instance.LaunchSpecification.ImageId = 'ami-08df4961';
-config.instance.LaunchSpecification.InstanceType = 'm1.medium';
+config.instance.SpotPrice = '0.080000';
+config.instance.LaunchSpecification.ImageId = 'ami-0cdf4965';
+config.instance.LaunchSpecification.InstanceType = 'c1.xlarge';
 config.instance.LaunchSpecification.UserData = userData;
+
 
 // Wait 30 minutes to get an instance
 var startupTimeout = setTimeout(onTimeoutError, 30*60*1000);
