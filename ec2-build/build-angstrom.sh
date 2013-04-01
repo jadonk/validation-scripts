@@ -27,8 +27,20 @@ time bitbake -k cloud9-gnome-image
 cd $BUILD/oe/build
 date
 echo !!!! COMPLETED build-angstrom.sh !!!!
+
 cd $BUILD
-tar czf sources.tgz oe/oebb.sh oe/README oe/conf oe/sources oe/scripts oe/.git $HOME/.oe/*
+rm -rf sources.tgz sources
+tar czf $BUILD/sources.tgz oe/oebb.sh oe/README oe/conf oe/sources oe/scripts oe/.git $HOME/.oe/*
+mkdir -p sources
+cd sources
+split -b 20M ../sources.tgz sources.tgz.
+
+cd $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone
+rm -rf rootfs
+mkdir -p rootfs
+cd rootfs
+split -b 20M ../Angstrom-Cloud9-IDE-GNOME-eglibc-ipk-v2012.12-beaglebone.rootfs.tar.gz rootfs.tgz.
+
 cd $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone
 MODULES=`ls modules*`
 cat >index.html <<EOF
@@ -44,14 +56,12 @@ cat >index.html <<EOF
 <li><a href="u-boot.img">u-boot.img</a></li>
 <li><a href="uImage">uImage</a></li>
 <li><a href="$MODULES">$MODULES</a></li>
-<li><a href="Angstrom-Cloud9-IDE-GNOME-eglibc-ipk-v2012.12-beaglebone.rootfs.tar.gz">
-Angstrom-Cloud9-IDE-GNOME-eglibc-ipk-v2012.12-beaglebone.rootfs.tar.gz
 </a></li>
-<li><a href="sources.tgz">sources.tgz</a></li>
-</ul>
-</body>
-</html>
 EOF
+ls $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone/rootfs | perl -pe 's/^(.*)$/<li><a href="rootfs\/$1">rootfs\/$1<\/a><\/li>/' >>index.html
+ls $BUILD/sources | perl -pe 's/^(.*)$/<li><a href="sources\/$1">sources\/$1<\/a><\/li>/' >>index.html
+echo "</ul></body></html>" >>index.html
+
 cd $BUILD/ec2-build
 ./s3cp $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone/index.html angstrom-$DATE
 ./s3cp $BUILD/build.log angstrom-$DATE
@@ -59,5 +69,5 @@ cd $BUILD/ec2-build
 ./s3cp $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone/u-boot.img angstrom-$DATE
 ./s3cp $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone/uImage angstrom-$DATE
 ./s3cp $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone/modules* angstrom-$DATE
-./s3cp $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone/Angstrom-Cloud9-IDE-GNOME-eglibc-ipk-v2012.12-beaglebone.rootfs.tar.gz angstrom-$DATE
-./s3cp $BUILD/sources.tgz angstrom-$DATE
+./s3cp $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone/rootfs angstrom-$DATE
+./s3cp $BUILD/sources angstrom-$DATE
