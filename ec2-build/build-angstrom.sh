@@ -42,7 +42,6 @@ cd rootfs
 split -b 20M ../Angstrom-Cloud9-IDE-GNOME-eglibc-ipk-v2012.12-beaglebone.rootfs.tar.gz rootfs.tgz.
 
 cd $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone
-MODULES=`ls modules*`
 cat >index.html <<EOF
 <html>
 <head>
@@ -52,12 +51,16 @@ cat >index.html <<EOF
 <h1>Angstrom $DATE</h1>
 <ul>
 <li><a href="build.log">build.log</a></li>
-<li><a href="MLO">MLO</a></li>
-<li><a href="u-boot.img">u-boot.img</a></li>
-<li><a href="uImage">uImage</a></li>
-<li><a href="$MODULES">$MODULES</a></li>
+<li><a href="Angstrom-Cloud9-IDE-GNOME-eglibc-ipk-v2012.12-beaglebone.rootfs.tar.gz">
+Angstrom-Cloud9-IDE-GNOME-eglibc-ipk-v2012.12-beaglebone.rootfs.tar.gz
+</a></li>
+<li><a href="sources.tgz">sources.tgz</a></li>
 </a></li>
 EOF
+ls $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone/MLO* | perl -pe 's/^(.*)$/<li><a href="$1">$1<\/a><\/li>/' >>index.html
+ls $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone/u-boot.img* | perl -pe 's/^(.*)$/<li><a href="$1">$1<\/a><\/li>/' >>index.html
+ls $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone/modules* | perl -pe 's/^(.*)$/<li><a href="$1">$1<\/a><\/li>/' >>index.html
+ls $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone/uImage* | perl -pe 's/^(.*)$/<li><a href="$1">$1<\/a><\/li>/' >>index.html
 ls $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone/rootfs | perl -pe 's/^(.*)$/<li><a href="rootfs\/$1">rootfs\/$1<\/a><\/li>/' >>index.html
 ls $BUILD/sources | perl -pe 's/^(.*)$/<li><a href="sources\/$1">sources\/$1<\/a><\/li>/' >>index.html
 echo "</ul></body></html>" >>index.html
@@ -65,9 +68,11 @@ echo "</ul></body></html>" >>index.html
 cd $BUILD/ec2-build
 ./s3cp $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone/index.html angstrom-$DATE
 ./s3cp $BUILD/build.log angstrom-$DATE
-./s3cp $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone/MLO angstrom-$DATE
-./s3cp $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone/u-boot.img angstrom-$DATE
-./s3cp $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone/uImage angstrom-$DATE
+./s3cp $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone/MLO* angstrom-$DATE
+./s3cp $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone/u-boot.img* angstrom-$DATE
+./s3cp $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone/uImage* angstrom-$DATE
 ./s3cp $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone/modules* angstrom-$DATE
 ./s3cp $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone/rootfs angstrom-$DATE
 ./s3cp $BUILD/sources angstrom-$DATE
+./s3cp $BUILD/oe/build/tmp-angstrom_v2012_12-eglibc/deploy/images/beaglebone/Angstrom-Cloud9-IDE-GNOME-eglibc-ipk-v2012.12-beaglebone.rootfs.tar.gz angstrom-$DATE
+./s3cp $BUILD/sources.tgz angstrom-$DATE

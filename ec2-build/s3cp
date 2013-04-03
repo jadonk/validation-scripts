@@ -2,15 +2,20 @@
 var s3copy = require('./s3-copy');
 var config = require(process.env["HOME"] + '/config');
 
-if(process.argv.length != 4) {
+if(process.argv.length < 4) {
  console.log("Usage: s3cp <src> <dest>");
  return(-1);
 }
 
-var src = process.argv[2];
-var dest = process.argv[3];
+var cmd = process.argv.shift();
+var script = process.argv.shift();
+var dest = process.argv.pop();
 
-s3copy.copy_to_s3(config, src, 'beagleboard', dest, oncomplete);
+var src;
+while(src = process.argv.shift()) {
+ //console.log([cmd, script, src, dest].join());
+ s3copy.copy_to_s3(config, src, 'beagleboard', dest, oncomplete);
+}
 
 function oncomplete(err) {
  if(err) console.log("Error: " + err);
