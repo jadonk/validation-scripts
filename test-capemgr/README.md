@@ -1,66 +1,115 @@
+Introduction
+============
 This is an example of using capemgr and devicetree overlays to configure
 a pinmux on the BeagleBone. The same procedure could be followed to
 load other drivers, but we should start with something simple.
 
+Rationale and benefits of devicetree
+------------------------------------
+With the massive numbers of processors within the ARM family, Linus Torvalds,
+the primary developer and maintainer of the Linux kernel pushed back on having
+a huge amount of software logic to distinguish the various features on the
+different processors.  Instead, he asked for ARM developers to leverage a
+feature that has been used by PowerPC developers for years to describe their
+processors using data structures, called devicetrees, eliminated all of the
+highly specialized logic introduced by every processor maker and making his
+job of maintaining the Linux kernel easlier.  An added benefit is that all
+ARM-architecture devices who make use of this infrastructure can potentially
+all use the same binary kernel, since compile-time options are largely
+eliminated by using these devicetrees to specify at boot time all of the
+various processor peripheral.
+
+For the PowerPC world, introduction of devicetree had great benefits in
+reducing the support burden in the Linux kernel for supporting a large
+number of devices.  Because these PowerPC devices were typically used in
+infrastructure projects, defining the connected peripherals at boot time
+was largely sufficient.  With a product like BeagleBone, however, where
+end-users seek to rapidly prototype with new hardware and new hardware
+configurations, specifying everything at boot time is highly limiting.
+In the BeagleBone environment, the ability to provide userspace interactions
+when defining the connected hardware becomes an absolute necessity.
+
+Introduction of devicetree overlays
+-----------------------------------
+Fortunately, Pantellis has offered us a solution with devicetree overlays
+that greatly simplifies development for BeagleBone users as well as users
+of other architectures, such as FPGAs (or FPGAs connected to BeagleBones
+for that matter) in being able to initiate loads of devicetree fragements
+during or after boot.  He further introduced a capemgr driver to assist
+with this activity.
+
+References
+----------
+https://lkml.org/lkml/2012/11/5/615 - Formalized overlay proposal
+http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/plain/Documentation/devicetree/usage-model.txt - Device Tree usage model documentation from the kernel
+
+Example
+=======
 We start by defining the two key sysfs entries we'll be using to check
 the status. 'slots' is an interface to capemgr that enables us to tell
 capemgr to load additional devicetree overlay fragments and for it to
 tell us what it has already loaded. It designed to utilize the EEPROMs
 on the cape plug-in boards to identify the board
 
-	# export SLOTS=/sys/devices/bone_capemgr.8/slots
-	# export PINS=/sys/kernel/debug/pinctrl/44e10800.pinmux/pins
+````sh
+export SLOTS=/sys/devices/bone_capemgr.8/slots
+export PINS=/sys/kernel/debug/pinctrl/44e10800.pinmux/pins
+````
 
 Here is my first example devicetree overlay (pinmux-test-7.dts):
 
-	/*
-	 * Copyright (C) 2012 Texas Instruments Incorporated - http://www.ti.com/
-	 *
-	 * This program is free software; you can redistribute it and/or modify
-	 * it under the terms of the GNU General Public License version 2 as
-	 * published by the Free Software Foundation.
-	 */
-	/dts-v1/;
-	/plugin/;
-	
-	/ {
-		compatible = "ti,beaglebone", "ti,beaglebone-black";
-	
-		/* identification */
-		part-number = "pinctrl-test-7";
-	
-		fragment@0 {
-			target = <&am33xx_pinmux>;
-			__overlay__ {
-				pinctrl_test: pinctrl_test_7_pins {
-					pinctrl-single,pins = <
-						0x164 0x07	/* P9_42 muxRegOffset, OUTPUT | MODE7 */
-					>;
-				};
-			};
-		};
-	
-		fragment@1 {
-			target = <&ocp>;
-			__overlay__ {
-				test_helper: helper {
-					compatible = "bone-pinmux-helper";
-					pinctrl-names = "default";
-					pinctrl-0 = <&pinctrl_test>;
-					status = "okay";
-				};
+````
+/*
+ * Copyright (C) 2012 Texas Instruments Incorporated - http://www.ti.com/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "ti,beaglebone", "ti,beaglebone-black";
+
+	/* identification */
+	part-number = "pinctrl-test-7";
+
+	fragment@0 {
+		target = <&am33xx_pinmux>;
+		__overlay__ {
+			pinctrl_test: pinctrl_test_7_pins {
+				pinctrl-single,pins = <
+					0x164 0x07	/* P9_42 muxRegOffset, OUTPUT | MODE7 */
+				>;
 			};
 		};
 	};
+
+	fragment@1 {
+		target = <&ocp>;
+		__overlay__ {
+			test_helper: helper {
+				compatible = "bone-pinmux-helper";
+				pinctrl-names = "default";
+				pinctrl-0 = <&pinctrl_test>;
+				status = "okay";
+			};
+		};
+	};
+};
+````
 
 We'll compile the device tree fragments and install them in /lib/firmware.
 Note that I'm doing this natively on the BeagleBone. I've pulled in the
 kernel sources and simply built this tool natively.
 
-	# dtc -O dtb -o pinctrl-test-7-00A0.dtbo -b 0 -@ pinctrl-test-7.dts
-	# dtc -O dtb -o pinctrl-test-0-00A0.dtbo -b 0 -@ pinctrl-test-0.dts
-	# cp pinctrl-test-7-00A0.dtbo /lib/firmware/
-	# cp pinctrl-test-0-00A0.dtbo /lib/firmware/
+````sh
+dtc -O dtb -o pinctrl-test-7-00A0.dtbo -b 0 -@ pinctrl-test-7.dts
+dtc -O dtb -o pinctrl-test-0-00A0.dtbo -b 0 -@ pinctrl-test-0.dts
+cp pinctrl-test-7-00A0.dtbo /lib/firmware/
+cp pinctrl-test-0-00A0.dtbo /lib/firmware/
+````
 
 Let's check out the starting point state.
 
