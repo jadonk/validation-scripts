@@ -49,10 +49,10 @@ as the driver or driver module is already built and included.
 
 References
 ----------
-1 https://lkml.org/lkml/2012/11/5/615
-2 https://lkml.org/lkml/2013/1/7/366
-3 http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/plain/Documentation/devicetree/bindings/
-4 http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/plain/Documentation/devicetree/usage-model.txt
+* [1] https://lkml.org/lkml/2012/11/5/615
+* [2] https://lkml.org/lkml/2013/1/7/366
+* [3] http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/plain/Documentation/devicetree/bindings/
+* [4] http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/plain/Documentation/devicetree/usage-model.txt
 
 Example
 =======
