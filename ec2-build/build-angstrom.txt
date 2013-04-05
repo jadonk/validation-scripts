@@ -31,6 +31,9 @@ packages:
  - npm
  - software-properties-common
  - gcc-arm-linux-gnueabi
+ - libc6-dev-i386
+ - g++-multilib
+ - libxi-dev
 
 debconf_selections: |
         debconf debconf/priority select critical
