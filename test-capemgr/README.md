@@ -35,13 +35,24 @@ Fortunately, Pantellis has offered us a solution with devicetree overlays
 that greatly simplifies development for BeagleBone users as well as users
 of other architectures, such as FPGAs (or FPGAs connected to BeagleBones
 for that matter) in being able to initiate loads of devicetree fragements
-during or after boot.  He further introduced a capemgr driver to assist
-with this activity.
+during or after boot.  His proposal was reviewed by the devicetree
+maintainers and the rationale was written up by Grant Likely [1].  Pantelis
+further introduced a capemgr [2] to assist with the activity of updating
+the devicetree information on a BeagleBone at boot and during run-time.
+
+Some of the real power of this can be explored by looking at the existing
+set of devicetree bindings available to developers [3].  Instead of
+altering the kernel source and rebuilding, it is possible for users to
+simply specify the driver to instantiate and provide all of the information
+needed to configure the driver in the devicetree overlay fragement, as long
+as the driver or driver module is already built and included.
 
 References
 ----------
-https://lkml.org/lkml/2012/11/5/615 - Formalized overlay proposal
-http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/plain/Documentation/devicetree/usage-model.txt - Device Tree usage model documentation from the kernel
+[1] https://lkml.org/lkml/2012/11/5/615
+[2] https://lkml.org/lkml/2013/1/7/366
+[3] http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/plain/Documentation/devicetree/bindings/
+[4] http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/plain/Documentation/devicetree/usage-model.txt
 
 Example
 =======
