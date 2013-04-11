@@ -26,28 +26,14 @@
 	};
 
 	fragment@1 {
-		target = <&epwmss0>;
-		__overlay__ {
-			status = "okay";
-		};
-	};
-
-	fragment@2 {
-		target = <&ehrpwm0>;
-		__overlay__ {
-			pinctrl-names	= "default";
-			pinctrl-0	= <&pwm_P9_22>;
-			status = "okay";
-		};
-	};
-
-	fragment@3 {
 		target = <&ocp>;
 		__overlay__ {
-			pwm_test {
+			pwm_test_P9_22 {
 				compatible	= "pwm_test";
 				pwms 		= <&ehrpwm0 0 500000 1>;
 				pwm-names 	= "PWM_P9_22";
+			    pinctrl-names	= "default";
+			    pinctrl-0	= <&pwm_P9_22>;
 				enabled		= <1>;
 				duty		= <0>;
 				status 		= "okay";
