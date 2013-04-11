@@ -17,7 +17,7 @@
 	version = "00A0";
 
 	fragment@0 {
-		target = <&am33xx_pwm_epwmss0>;
+		target = <&epwmss0>;
 		__overlay__ {
 			status = "okay";
 		};
@@ -38,27 +38,41 @@
 	};
 
 	fragment@3 {
-		target = <&ehrpwm1>;
+		target = <&epwmss1>;
 		__overlay__ {
 			status = "okay";
 		};
 	};
 
 	fragment@4 {
-		target = <&ecap1>;
+		target = <&ehrpwm1>;
 		__overlay__ {
 			status = "okay";
 		};
 	};
 
 	fragment@5 {
-		target = <&ehrpwm2>;
+		target = <&ecap1>;
 		__overlay__ {
 			status = "okay";
 		};
 	};
 
 	fragment@6 {
+		target = <&epwmss2>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@7 {
+		target = <&ehrpwm2>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@8 {
 		target = <&ecap2>;
 		__overlay__ {
 			status = "okay";
