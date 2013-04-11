@@ -26,8 +26,8 @@ install:
 
 test:
 	echo $(DTBO_PWM) > $(SLOTS)
-	for dtbo_pin in $(DTBO_PINS); do
-		echo $(dtbo_pin) > $(SLOTS)
+	for dtbo_pin in $(DTBO_PINS) ; do \
+		echo $$dtbo_pin > $(SLOTS) ; \
 	done;
 	cat $(SLOTS)
 
