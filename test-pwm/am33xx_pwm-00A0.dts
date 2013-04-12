@@ -52,27 +52,20 @@
 	};
 
 	fragment@5 {
-		target = <&ecap1>;
-		__overlay__ {
-			status = "okay";
-		};
-	};
-
-	fragment@6 {
 		target = <&epwmss2>;
 		__overlay__ {
 			status = "okay";
 		};
 	};
 
-	fragment@7 {
+	fragment@6 {
 		target = <&ehrpwm2>;
 		__overlay__ {
 			status = "okay";
 		};
 	};
 
-	fragment@8 {
+	fragment@7 {
 		target = <&ecap2>;
 		__overlay__ {
 			status = "okay";

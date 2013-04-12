@@ -6,9 +6,8 @@ PINS_A = \
 	P9_16 \
 	P8_19 \
 	P8_13 \
-
-#	P9_42 \
-#	P9_28 \
+	P9_42 \
+	P9_28 \
 
 PINS_B = \
 	P9_31 \
@@ -28,25 +27,20 @@ all:	$(DTBO_FILES)
 clean:
 	rm $(DTBO_FILES)
 
+load_a:
+	echo $(PWM) > $(SLOTS)
+	for pin in $(PINS_A) ; do \
+		echo bone_pwm_$$pin > $(SLOTS) ; \
+	done;
+
+load_b:
+	echo $(PWM) > $(SLOTS)
+	for pin in $(PINS_B) ; do \
+		echo bone_pwm_$$pin > $(SLOTS) ; \
+	done;
+
 install:
 	install -m 0644 $(DTBO_FILES) /lib/firmware
-
-load_dtbo_pwm:
-#	echo $(PWM) > $(SLOTS)
-
-load_dtbo_pins_a: load_dtbo_pwm
-#	for pin in $(PINS_A) ; do \
-#		echo bone_pwm_$$pin > $(SLOTS) ; \
-#	done;
-
-test:
-	cat $(SLOTS)
-	for pin in $(PINS_A) ; do \
-		DUTY=`ls /sys/devices/ocp.*/pwm_test_$$pin*/duty` \
-		if [ $$? -eq 0 ] ; then \
-			echo 250000 > $$DUTY ; \
-		fi; \
-	done;
 
 %.dtbo:	%.dts
 	dtc -O dtb -o $@ -b 0 -@ $<
