@@ -10,7 +10,7 @@ var fs = require('fs');
 var ec2build = require('./ec2-build');
 var winston = require('winston');
 var http = require('http');
-var child_process = require('child_process')
+var child_process = require('child_process');
 
 var stop = 0;
 
@@ -149,7 +149,9 @@ function printLog(data) {
   if(!configCopied) {
    configCopied = 1;
    try {
-    child_process.exec('scp -i ' + config.sshkey.file + ' ' + config.config.file +' ubuntu@' + address + ':');
+    var myexec = 'scp -i ' + config.sshkey.file + ' ' + config.config.file +' ubuntu@' + address + ':';
+    winston.info('Exec: ' + myexec);
+    child_process.exec(myexec);
    } catch(ex) {
    }
   }
