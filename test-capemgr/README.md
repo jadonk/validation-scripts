@@ -53,6 +53,7 @@ References
 * [2] https://lkml.org/lkml/2013/1/7/366
 * [3] http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/plain/Documentation/devicetree/bindings/
 * [4] http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/plain/Documentation/devicetree/usage-model.txt
+* [5] [https://docs.google.com/document/d/17P54kZkZO_-JtTjrFuVz-Cp_RMMg7GB_8W9JK9sLKfA/edit?hl=en&forcehl=1#heading=h.j4ega7pcz5c]
 
 Example
 =======
