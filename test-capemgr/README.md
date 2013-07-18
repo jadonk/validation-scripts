@@ -181,7 +181,9 @@ for my pin of interest. Let's take a look and see that the mux mode is now 7.
 	# cat $PINS | grep 964
 	pin 89 (44e10964) 00000007 pinctrl-single 
 
-Now let's tell capemgr to unload that overlay so that we can load a new one.
+Now let's tell capemgr to unload that overlay so that we can load a new one 
+you can use the following perl script or simply echo "-<slotnum>" > $SLOTS 
+where slotnum is the number of the slot.
 
 	# A=`perl -pe 's/^.*(\d+):.*/$1/' $SLOTS | tail -1`
 	# echo "-$A"
