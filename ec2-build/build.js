@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 if(process.argv.length < 3) {
- console.log("Usage: build.sh kernel|angstrom");
+ console.log("Usage: ./build.js kernel|angstrom|buildroot");
  return;
 }
 var target = process.argv[2];
@@ -58,6 +58,9 @@ function onError(err) {
 };
 
 function saveWork(callback) {
+ callback();
+ return;
+
  try {
   var now = new Date();
   var datestr = now.toJSON();

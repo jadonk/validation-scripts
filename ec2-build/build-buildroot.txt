@@ -1,0 +1,69 @@
+#cloud-config
+packages:
+ - build-essential
+ - subversion
+ - git-core
+ - libncurses5-dev
+ - zlib1g-dev
+ - gawk
+ - flex
+ - quilt
+ - libssl-dev
+ - xsltproc
+ - libxml-parser-perl
+ - mercurial
+ - bzr
+ - ecj
+ - cvs
+ - sed
+ - wget
+ - lzop
+ - nodejs
+ - nodejs-dev
+ - nodejs-legacy
+ - npm
+ - software-properties-common
+ - gcc-arm-linux-gnueabi
+ - libc6-dev-i386
+ - gcc-multilib 
+ - g++-multilib
+ - libxi-dev
+ - gettext
+ - s3cmd
+
+debconf_selections: |
+        debconf debconf/priority select critical
+        dash dash/sh boolean false
+
+write_files:
+ - content: |
+        #!/usr/bin/env node
+        var express = require('express');
+        var socketio = require('socket.io');
+        var http = require('http');
+        var app = express();
+        app.use(express.favicon());
+        app.use(express.logger('dev'));
+        app.use(express.bodyParser());
+        app.use(express.directory(process.cwd()));
+        app.use(express.static(process.cwd()));
+        var server = http.createServer(app);
+        var io = socketio.listen(server);
+        server.listen(8081);
+        io.sockets.on('connection', onConnection);
+        function onConnection(socket) {
+        }
+   owner: root:root
+   path: /usr/local/bin/server.sh
+   permissions: '0755'
+
+runcmd:
+ - dpkg-reconfigure -f noninteractive dash
+ - mkdir /mnt/build
+ - chown ubuntu /mnt/build
+ - npm install -g express@3.1.2 socket.io@0.9.16 socket.io-client@0.9.16
+ - iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8081
+ - [ su, -c, "( git clone git://github.com/jadonk/validation-scripts.git /mnt/build )", ubuntu ]
+ - [ su, -c, "( cd /mnt/build; nohup /usr/local/bin/server.sh >server.log & )", ubuntu ]
+ - [ su, -c, "( cd /mnt/build; nohup ec2-build/build-buildroot.sh >build.log & )", ubuntu ]
+
