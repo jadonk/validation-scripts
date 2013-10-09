@@ -38,12 +38,21 @@ var startupTimeout = setTimeout(onTimeoutError, 30*60*1000);
 
 function onTimeoutError() {
  onError("Timeout");
-};
+}
+
+function onInstanceError(err) {
+ onError("Instance error: " + err);
+}
+
+function onUncaughtExceptionError(err) {
+ onError("Uncaught exception error: " + err);
+}
 
 try {
  var instance = ec2build.run(config, onRun);
  process.on('SIGINT', onKill);
- instance.on('error', onError);
+ process.on('uncaughtException', onUncaughtExceptionError);
+ instance.on('error', onInstanceError);
 } catch(ex) {
  onError("Error invoking ec2build.run: " + ex);
 }
@@ -147,12 +156,12 @@ function collectLog(data) {
 };
 
 var configCopied = 0;
-function printLog(data) {
+function printLog() {
  if(log != previousLog) {
   if(!configCopied) {
    configCopied = 1;
    try {
-    var myexec = 'scp -i ' + config.sshkey.file + ' ' + config.config.file +' ubuntu@' + address + ':';
+    var myexec = 'scp -o "StrictHostKeyChecking no" -i ' + config.sshkey.file + ' ' + config.config.file +' ubuntu@' + address + ':';
     winston.info('Exec: ' + myexec);
     child_process.exec(myexec);
    } catch(ex) {
@@ -185,3 +194,4 @@ function doExit() {
  winston.transports.File.flush();
  process.exit();
 };
+
