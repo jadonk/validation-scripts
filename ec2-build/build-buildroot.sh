@@ -12,7 +12,6 @@ fi
 cd $BUILD/buildroot
 time make beaglebone_defconfig
 time make
-echo !!!! COMPLETED build-buildroot !!!!
 
 cd $OUTPUT
 cat >index.html <<EOF
@@ -32,3 +31,4 @@ node -pe "c=require('$HOME/config');require('fs').readFileSync('$BUILD/ec2-build
 s3cmd sync $OUTPUT s3://beagle/buildroot/$DATE
 s3cmd put $BUILD/build.log s3://beagle/buildroot/$DATE
 
+echo !!!! COMPLETED build-buildroot !!!!

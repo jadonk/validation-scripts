@@ -167,9 +167,9 @@ function printLog(data) {
   previousLog += log;
   timesChecked = 0;
  }
- //if(log.match(/!!!! COMPLETED/)) {
- // saveWork(stopBuild);
- //}
+ if(log.match(/!!!! COMPLETED/)) {
+  saveWork(stopBuild);
+ }
 };
 
 function statusError(e) {

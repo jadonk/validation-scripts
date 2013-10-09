@@ -30,6 +30,7 @@ packages:
  - libxi-dev
  - gettext
  - s3cmd
+ - unzip
 
 debconf_selections: |
         debconf debconf/priority select critical
