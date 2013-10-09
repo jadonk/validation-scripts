@@ -7,7 +7,7 @@ DATE=`date +%F-%T`
 echo $DATE
 if [ ! -e $BUILD/buildroot ]
 then
- time git clone git://github.com/jadonk/buildroot.git $BUILD/buildroot
+ time git clone git://git.busybox.net/buildroot $BUILD/buildroot
 fi
 cd $BUILD/buildroot
 time make beaglebone_defconfig
