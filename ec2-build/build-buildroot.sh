@@ -28,7 +28,7 @@ ls $OUTPUT | perl -pe 's/^(.*)$/<li><a href="$1">$1<\/a><\/li>/' >>index.html
 echo "</ul></body></html>" >>index.html
 
 node -pe "c=require('$HOME/config');require('fs').readFileSync('$BUILD/ec2-build/s3cfg').toString().replace(/_AK_/,c.client.accessKeyId).replace(/_SK_/,c.client.secretAccessKey);" > $HOME/.s3cfg
-s3cmd sync $OUTPUT s3://beagle/buildroot/$DATE
-s3cmd put $BUILD/build.log s3://beagle/buildroot/$DATE
+s3cmd sync -P $OUTPUT/ s3://beagle/buildroot/$DATE/
+s3cmd put -P $BUILD/build.log s3://beagle/buildroot/$DATE/
 
 echo !!!! COMPLETED build-buildroot !!!!
