@@ -143,8 +143,7 @@ function printLog() {
   timesChecked = 0;
   if(needConfig) {
    needConfig = false;
-   var myexec = 'scp -o "StrictHostKeyChecking no" -i /home/test/.ssh/maemo-ami-keypair /home/test/config.js ubuntu@' + address + ':';
-   //var myexec = 'scp -o "StrictHostKeyChecking no" -i ' + config.sshkey.file + ' ' + config.config.file +' ubuntu@' + address + ':';
+   var myexec = 'scp -o "StrictHostKeyChecking no" -i ' + config.sshkey.file + ' ' + config.config.file +' ubuntu@' + address + ':';
    try {
     winston.info('Exec: ' + myexec);
     child_process.exec(myexec, execNullHandler);
