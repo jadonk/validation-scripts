@@ -85,7 +85,7 @@ function onRun(err, data) {
  clearTimeout(startupTimeout);
  winston.info("Build running");
  winston.info("name = " + data.name);
- winston.debug("address = " + data.address);
+ winston.info("address = " + data.address);
  winston.debug("data = " + JSON.stringify(data));
  address = data.address;
  if(err) {
