@@ -17,7 +17,7 @@ var stop = 0;
 winston.setLevels(winston.config.syslog.levels);
 var winstonFileParams = {
  filename: 'build-' + target + '.log',
- level: 'debug'
+ //level: 'debug'
 };
 winston.add(winston.transports.File, winstonFileParams);
 
@@ -45,7 +45,8 @@ function onInstanceError(err) {
 }
 
 function onUncaughtExceptionError(err) {
- onError("Uncaught exception error: " + err);
+ //onError("Uncaught exception error: " + err);
+ winston.error("Uncaught exception error: " + err);
 }
 
 try {
