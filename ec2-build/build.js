@@ -16,7 +16,7 @@ var child_process = require('child_process');
 
 var stop = 0;
 
-winston.setLevels(winston.config.syslog.levels);
+//winston.setLevels(winston.config.syslog.levels);
 var winstonFileParams = {
  filename: 'build-' + target + '.log',
  //level: 'debug'
@@ -121,7 +121,7 @@ function checkLog() {
 }
 
 function currentLog(response) {
- winston.info("Got response: " + response.statusCode);
+ winston.debug("Got response: " + response.statusCode);
  response.on('data', collectLog);
  response.on('end', printLog);
 }
@@ -138,7 +138,7 @@ function printLog() {
   } catch(ex) {
    winston.debug("Unable to trim log");
   }
-  winston.debug(log);
+  winston.info(log);
   previousLog += log;
   timesChecked = 0;
   if(needConfig) {
@@ -160,7 +160,7 @@ function printLog() {
 };
 
 function statusError(e) {
- winston.debug("Got error: " + e.message);
+ winston.error("Got error: " + e.message);
 };
 
 function onKill() {
