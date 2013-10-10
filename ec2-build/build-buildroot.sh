@@ -31,4 +31,6 @@ node -pe "c=require('$HOME/config');require('fs').readFileSync('$BUILD/ec2-build
 s3cmd sync -P $OUTPUT/ s3://beagle/buildroot/$DATE/
 s3cmd put -P $BUILD/build.log s3://beagle/buildroot/$DATE/
 
+node -pe "c=require('$HOME/config');a=require('aws-sdk');a.config.update(c.client);s=new a.SES.Client(c.client);s.sendEmail({Source:c.email.from,Destination:c.email.to,Message:{Subject:{Data:'Completed build-buildroot.sh'},Body:{Data:'http://beagle.s3.amazonaws.com/buildroot/$DATE/'}}});"
+
 echo !!!! COMPLETED build-buildroot !!!!
