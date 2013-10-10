@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 if(process.argv.length < 3) {
- console.log("Usage: ./build.js kernel|angstrom|buildroot");
+ console.log("Usage: ./build.js kernel|angstrom|buildroot [-s]");
  return;
 }
 var target = process.argv[2];
+var nostop = false;
+if(process.argv.length == 4 && process.argv[3] == '-s') { nostop=true; }
 
 var config = require(process.env["HOME"] + '/config');
 var fs = require('fs');
@@ -70,38 +72,10 @@ function onError(err) {
 function saveWork(callback) {
  callback();
  return;
-
- try {
-  var now = new Date();
-  var datestr = now.toJSON();
-  var body = JSON.stringify({
-   'config': config.client,
-   'source': "/mnt/build",
-   'bucket': "beagleboard",
-   'dest': "build-" + target + "-" + datestr
-  });
-  var options = {
-   hostname: address,
-   method: 'POST',
-   path: '/s3copy',
-   headers: {
-    "Content-Type": "application/json",
-    "Content-Length": body.length
-   }
-  };
-  var request = http.request(options, showSaveResponse);
-  request.on('error', callback);
-  request.end(body);
-  function showSaveResponse(response) {
-   response.on('data', function() {});
-   response.on('end', callback);
-  }
- } catch(ex) {
-  callback(ex);
- }
 }
  
 function stopBuild() {
+ if(nostop) doExit();
  ec2build.stop(doExit);
 }
 
@@ -144,38 +118,42 @@ function checkLog() {
  } else {
   setTimeout(checkLog, 60000);
  }
-};
+}
 
 function currentLog(response) {
  winston.info("Got response: " + response.statusCode);
  response.on('data', collectLog);
  response.on('end', printLog);
-};
+}
 
 function collectLog(data) {
- log += data
-};
+ log += data;
+}
 
-var configCopied = 0;
+var needConfig = true;
 function printLog() {
  if(log != previousLog) {
-  if(!configCopied) {
-   configCopied = 1;
-   try {
-    var myexec = 'scp -o "StrictHostKeyChecking no" -i ' + config.sshkey.file + ' ' + config.config.file +' ubuntu@' + address + ':';
-    winston.info('Exec: ' + myexec);
-    child_process.exec(myexec);
-   } catch(ex) {
-   }
-  }
   try {
    log = log.replace(previousLog, "");
   } catch(ex) {
    winston.debug("Unable to trim log");
   }
-  winston.info(log);
+  winston.debug(log);
   previousLog += log;
   timesChecked = 0;
+  if(needConfig) {
+   needConfig = false;
+   var myexec = 'scp -o "StrictHostKeyChecking no" -i /home/test/.ssh/maemo-ami-keypair /home/test/config.js ubuntu@' + address + ':';
+   //var myexec = 'scp -o "StrictHostKeyChecking no" -i ' + config.sshkey.file + ' ' + config.config.file +' ubuntu@' + address + ':';
+   try {
+    winston.info('Exec: ' + myexec);
+    child_process.exec(myexec, execNullHandler);
+    function execNullHandler() {}
+   } catch(ex) {
+    winston.error('Exec: ' + myexec);
+    winston.error('Exec failed: ' + ex);
+   }
+  }
  }
  if(log.match(/!!!! COMPLETED/)) {
   saveWork(stopBuild);
@@ -192,7 +170,12 @@ function onKill() {
 };
 
 function doExit() {
- winston.transports.File.flush();
- process.exit();
+ try {
+  winston.info('Exiting', { seriously: true }, function (err, level, msg, meta) {
+   process.exit();
+  });
+ } catch(ex) {
+  process.exit();
+ }
 };
 
