@@ -23,7 +23,7 @@ var child_process = require('child_process');
 
 var stop = 0;
 
-//winston.setLevels(winston.config.syslog.levels);
+winston.setLevels(winston.config.syslog.levels);
 var winstonFileParams = {
  filename: 'build-' + target + '.log',
  //level: 'debug'
