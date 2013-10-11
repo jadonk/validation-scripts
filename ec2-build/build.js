@@ -85,7 +85,7 @@ function saveWork(callback) {
  
 function stopBuild() {
  if(nostop) doExit();
- ec2build.stop(doExit);
+ else ec2build.stop(doExit);
 }
 
 var address = null;
