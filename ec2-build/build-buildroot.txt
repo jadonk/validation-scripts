@@ -71,7 +71,7 @@ write_files:
         if [ ! -e $BUILD/buildroot ]
         then
          if [ xx$TREE != xx ]; then
-          time git checkout $TREE $BUILD/buildroot
+          time git clone $TREE $BUILD/buildroot
          else
           time git clone git://git.busybox.net/buildroot $BUILD/buildroot
          fi
