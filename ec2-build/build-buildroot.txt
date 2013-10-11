@@ -58,6 +58,49 @@ write_files:
    owner: root:root
    path: /usr/local/bin/server.sh
    permissions: '0755'
+ - content: |
+        #!/bin/sh
+        #set -e
+        set -x
+        BUILD=/mnt/build
+        OUTPUT=$BUILD/buildroot/output/images
+        DATE=`date +%F-%T`
+        TREE=!!!TREE!!!
+        COMMIT=!!!COMMIT!!!
+        echo $DATE
+        if [ ! -e $BUILD/buildroot ]
+        then
+         if [ xx$TREE != xx ]; then
+          time git checkout $TREE $BUILD/buildroot
+         else
+          time git clone git://git.busybox.net/buildroot $BUILD/buildroot
+         fi
+         if [ xx$COMMIT != xx ]; then git checkout $COMMIT; fi
+        fi
+        cd $BUILD/buildroot
+        time make beaglebone_defconfig
+        time make
+        cd $OUTPUT
+        cat >index.html <<EOF
+        <html>
+        <head>
+        <title>Buildroot $DATE</title>
+        </head>
+        <body>
+        <h1>Buildroot $DATE</h1>
+        <ul>
+        <li><a href="build.log">build.log</a></li>
+        EOF
+        ls $OUTPUT | perl -pe 's/^(.*)$/<li><a href="$1">$1<\/a><\/li>/' >>index.html
+        echo "</ul></body></html>" >>index.html
+        node -pe "c=require('$HOME/config');require('fs').readFileSync('$BUILD/ec2-build/s3cfg').toString().replace(/_AK_/,c.client.accessKeyId).replace(/_SK_/,c.client.secretAccessKey);" > $HOME/.s3cfg
+        s3cmd sync -P $OUTPUT/ s3://beagle/buildroot/$DATE/
+        s3cmd put -P $BUILD/build.log s3://beagle/buildroot/$DATE/
+        node -pe "c=require('$HOME/config');a=require('aws-sdk');a.config.update(c.client);s=new a.SES.Client(c.client);s.sendEmail({Source:c.email.from,Destination:{ToAddresses:c.email.to},Message:{Subject:{Data:'[beagle-validation] Completed build-buildroot.sh'},Body:{Text:{Data:'http://beagle.s3.amazonaws.com/buildroot/$DATE/index.html\nhttp://github.com/jadonk/validation-scripts/ec2-build'}}}},function(err){console.log('err = ' + err);});"
+        echo !!!! COMPLETED build-buildroot !!!!
+   owner: root:root
+   path: /usr/local/bin/build-buildroot.sh
+   permissions: '0755'
 
 runcmd:
  - dpkg-reconfigure -f noninteractive dash
@@ -66,7 +109,7 @@ runcmd:
  - echo NODE_PATH=/usr/local/lib/node_modules >> /etc/environment
  - npm install -g express@3.1.2 socket.io@0.9.16 socket.io-client@0.9.16 aws-sdk@0.9.5-pre.6
  - iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8081
- - [ su, -c, "( git clone git://github.com/jadonk/validation-scripts.git /mnt/build )", ubuntu ]
+ - [ su, -c, "( git clone git://github.com/jadonk/validation-scripts.git /mnt/build/scripts )", ubuntu ]
  - [ su, -c, "( cd /mnt/build; nohup /usr/local/bin/server.sh >server.log & )", ubuntu ]
- - [ su, -c, "( cd /mnt/build; nohup ec2-build/build-buildroot.sh >build.log & )", ubuntu ]
+ - [ su, -c, "( cd /mnt/build; nohup /usr/local/bin/build-buildroot.sh >build.log & )", ubuntu ]
 

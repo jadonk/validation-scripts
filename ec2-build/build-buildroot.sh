@@ -4,10 +4,17 @@ set -x
 BUILD=/mnt/build
 OUTPUT=$BUILD/buildroot/output/images
 DATE=`date +%F-%T`
+BUILDROOT_TREE=
+BUILDROOT_TAG=
 echo $DATE
 if [ ! -e $BUILD/buildroot ]
 then
- time git clone git://git.busybox.net/buildroot $BUILD/buildroot
+ if [ xx$BUILDROOT_TREE != xx ]; then
+  time git checkout $BUILDROOT_TREE $BUILD/buildroot
+ else
+  time git clone git://git.busybox.net/buildroot $BUILD/buildroot
+ fi
+ if [ xx$BUILDROOT_TAG != xx ]; then git checkout $BUILDROOT_TAG; fi
 fi
 cd $BUILD/buildroot
 time make beaglebone_defconfig

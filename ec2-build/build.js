@@ -1,11 +1,18 @@
 #!/usr/bin/env node
 if(process.argv.length < 3) {
- console.log("Usage: ./build.js kernel|angstrom|buildroot [-s]");
+ console.log("Usage: ./build.js kernel|angstrom|buildroot [-s] [-t=<tree>] [-c=<commit>]");
  return;
 }
 var target = process.argv[2];
 var nostop = false;
-if(process.argv.length == 4 && process.argv[3] == '-s') { nostop=true; }
+var tree = '';
+var commit = '';
+while(process.argv.length > 3) {
+ var myarg = process.argv.pop();
+ if(myarg == '-s') { nostop = true; }
+ if(myarg.match(/^-t=/)) { tree = myarg.replace(/^-t=/, ''); }
+ if(myarg.match(/^-c=/)) { commit = myarg.replace(/^-c=/, ''); }
+}
 
 var config = require(process.env["HOME"] + '/config');
 var fs = require('fs');
@@ -26,6 +33,8 @@ winston.add(winston.transports.File, winstonFileParams);
 winston.info("building " + target);
 
 var userData = fs.readFileSync('./build-' + target + '.txt', 'ascii').toString('base64');
+userData = userData.replace(/!!!TREE!!!/, tree);
+userData = userData.replace(/!!!COMMIT!!!/, commit);
 userData = new Buffer(userData).toString('base64');
 winston.debug('userData = ' + userData);
 
