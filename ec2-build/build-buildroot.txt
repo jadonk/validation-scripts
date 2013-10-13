@@ -78,7 +78,7 @@ write_files:
          if [ xx$COMMIT != xx ]; then
           cd $BUILD/buildroot
           time git checkout $COMMIT
-	 fi
+         fi
         fi
         cd $BUILD/buildroot
         time make beaglebone_defconfig

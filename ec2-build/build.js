@@ -26,17 +26,18 @@ var stop = 0;
 winston.setLevels(winston.config.syslog.levels);
 var winstonFileParams = {
  filename: 'build-' + target + '.log',
- //level: 'debug'
+ level: 'debug'
 };
 winston.add(winston.transports.File, winstonFileParams);
 
 winston.info("building " + target);
 
-var userData = fs.readFileSync('./build-' + target + '.txt', 'ascii').toString('base64');
+var userData = fs.readFileSync('./build-' + target + '.txt', 'ascii');
 userData = userData.replace(/!!!TREE!!!/, tree);
 userData = userData.replace(/!!!COMMIT!!!/, commit);
-userData = new Buffer(userData).toString('base64');
 winston.debug('userData = ' + userData);
+userData = userData.toString('base64');
+userData = new Buffer(userData).toString('base64');
 
 config.instance.SpotPrice = '0.080000';
 config.instance.LaunchSpecification.ImageId = 'ami-0cdf4965';
