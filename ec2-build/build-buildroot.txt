@@ -59,7 +59,7 @@ write_files:
    path: /usr/local/bin/server.sh
    permissions: '0755'
  - content: |
-        #!/bin/sh
+        #!/bin/bash
         #set -e
         set -x
         BUILD=/mnt/build
@@ -97,7 +97,10 @@ write_files:
         ls $OUTPUT | perl -pe 's/^(.*)$/<li><a href="$1">$1<\/a><\/li>/' >>index.html
         echo "</ul></body></html>" >>index.html
         node -pe "c=require('$HOME/config');require('fs').readFileSync('/usr/local/share/s3cfg').toString().replace(/_AK_/,c.client.accessKeyId).replace(/_SK_/,c.client.secretAccessKey);" > $HOME/.s3cfg
-        s3cmd sync -P $OUTPUT/ s3://beagle/buildroot/$DATE/
+        NEXT_WAIT_TIME=0
+        until s3cmd sync -P $OUTPUT/ s3://beagle/buildroot/$DATE/ || [ $NEXT_WAIT_TIME -eq 4 ]; do
+         sleep $(( NEXT_WAIT_TIME++ ))
+        done
         s3cmd put -P $BUILD/build.log s3://beagle/buildroot/$DATE/
         node -e "c=require('$HOME/config');a=require('aws-sdk');a.config.update(c.client);s=new a.SES.Client(c.client);s.sendEmail({Source:c.email.from,Destination:{ToAddresses:c.email.to},Message:{Subject:{Data:'[beagle-validation] Completed build-buildroot.sh'},Body:{Text:{Data:'http://beagle.s3.amazonaws.com/buildroot/$DATE/index.html\nhttp://github.com/jadonk/validation-scripts'}}}},function(err){console.log('err = ' + err);});"
         echo !!!! COMPLETED build-buildroot !!!!
